@@ -1,3 +1,4 @@
 def main():
-    from pibackbone.pibackbone import PiBackbone
+    """Main entrypoint for PiBackbone"""
+    from pibackbone.pibackbone import PiBackbone  # pylint: import-outside-toplevel
     PiBackbone().main()
