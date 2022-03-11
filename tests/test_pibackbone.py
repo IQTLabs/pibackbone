@@ -2,7 +2,7 @@
 Test module for pibackbone.
 @author: Charlie Lewis
 """
-from pibackbone.pibackbone import PiBackbone
+from pibackbone.main import PiBackbone
 
 
 def test_initial_question():
