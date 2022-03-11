@@ -20,6 +20,7 @@ jobs:
         for shellscript in $(find . -type f -name "*.sh"); do /bin/bash -n "$shellscript" && shellcheck -x "$shellscript"; done
     - name: unit_test
       run: |
+        pip3 install -r tests/requirements.txt && \
         pip3 install . && \
         export PYTHONPATH=$PWD/pibackbone:$PYTHONPATH && \
         pytype . && \
