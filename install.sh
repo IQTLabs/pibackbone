@@ -36,7 +36,7 @@ sudo systemctl disable apt-daily-upgrade.timer
 sudo cp config.txt /boot/config.txt
 sudo raspi-config nonint do_i2c 0
 
-cd $cwd
+cd "$cwd"
 
 # run pibackbone
 pibackbone
