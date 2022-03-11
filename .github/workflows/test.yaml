@@ -24,7 +24,7 @@ jobs:
         pip3 install . && \
         export PYTHONPATH=$PWD/pibackbone:$PYTHONPATH && \
         pytype . && \
-        pylint --fail-under=6.0 && \
+        pylint --fail-under=6.0 . && \
         PATH=/home/runner/.local/bin:$PATH py.test -v -vv --capture=tee-sys --cov-report term-missing --cov=pibackbone -c .coveragerc && \
         PATH=/home/runner/.local/bin:$PATH coverage report && \
         PATH=/home/runner/.local/bin:$PATH coverage xml
