@@ -1,5 +1,13 @@
 CHANGES
 =======
 
+* try without installing package
+* more lint
+* lint
+* needs to be a package dir
+* missing path arg
+* install test requirements
+* add tests
+* add initial questions
 * basic skeleton
 * Initial commit
