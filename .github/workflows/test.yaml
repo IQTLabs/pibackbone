@@ -24,7 +24,6 @@ jobs:
         python3 -m pip install -U pip && \
         git clone https://github.com/RPi-Distro/RTIMULib.git -b V7.2.1 && \
         cd RTIMULib/Linux/python && python3 setup.py build && sudo python3 setup.py install && cd ../../.. && \
-        find PiBuoyV2 -type f -name \*requirements.txt -exec pip3 install -r {} \; && \
         pip3 install codecov pytest-cov pytest smbus urwid && \
         curl -L https://github.com/pisupply/pijuice/tarball/V1.8 | tar -xz && \
         cd PiSupply-PiJuice-bc61c0f/Software/Source && \
