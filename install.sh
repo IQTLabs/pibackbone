@@ -13,7 +13,7 @@ git --version > /dev/null || echo "First install git then try again."
 uname -m > /dev/null # TODO check for arm, and version
 
 # install docker if it's not already
-docker version || echo "Installing Docker..." && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker $(whoami)
+docker version || echo "Installing Docker..." && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker "$(whoami)"
 
 # pull down pibackbone repo and install
 cd /opt
