@@ -76,6 +76,8 @@ class PiBackbone():
                      'checked': True},
                     {'name': 'Sense HAT',
                      'checked': True},
+                    {'name': 'S3 Uploader',
+                     'checked': True},
                 ],
             },
         ]
