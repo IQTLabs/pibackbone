@@ -5,12 +5,12 @@ import argparse
 import logging
 import os
 
-import docker
+#import docker
 from examples import custom_style_2
-from plumbum import FG  # pytype: disable=import-error
-from plumbum import local  # pytype: disable=import-error
-from plumbum import TF  # pytype: disable=import-error
-from plumbum.cmd import docker_compose  # pytype: disable=import-error
+#from plumbum import FG  # pytype: disable=import-error
+#from plumbum import local  # pytype: disable=import-error
+#from plumbum import TF  # pytype: disable=import-error
+#from plumbum.cmd import docker_compose  # pytype: disable=import-error
 from PyInquirer import prompt
 
 from pibackbone import __version__
