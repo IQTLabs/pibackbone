@@ -6,13 +6,14 @@ import logging
 import os
 
 import docker
-from pibackbone import __version__
 from examples import custom_style_2
 from plumbum import FG  # pytype: disable=import-error
 from plumbum import local  # pytype: disable=import-error
 from plumbum import TF  # pytype: disable=import-error
 from plumbum.cmd import docker_compose  # pytype: disable=import-error
 from PyInquirer import prompt
+
+from pibackbone import __version__
 
 
 level_int = {'CRITICAL': 50, 'ERROR': 40, 'WARNING': 30, 'INFO': 20,
@@ -96,5 +97,3 @@ class PiBackbone():
             answer = self.execute_prompt(self.project_question())
         else:
             answer = self.execute_prompt(self.core_question())
-
-        return
