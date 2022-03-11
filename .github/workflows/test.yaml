@@ -20,6 +20,15 @@ jobs:
         for shellscript in $(find . -type f -name "*.sh"); do /bin/bash -n "$shellscript" && shellcheck -x "$shellscript"; done
     - name: unit_test
       run: |
+        sudo apt-get update && sudo apt-get install -y python3-dev libjpeg62-dev procps zlib1g-dev build-essential curl i2c-tools && \
+        python3 -m pip install -U pip && \
+        git clone https://github.com/RPi-Distro/RTIMULib.git -b V7.2.1 && \
+        cd RTIMULib/Linux/python && python3 setup.py build && sudo python3 setup.py install && cd ../../.. && \
+        find PiBuoyV2 -type f -name \*requirements.txt -exec pip3 install -r {} \; && \
+        pip3 install codecov pytest-cov pytest smbus urwid && \
+        curl -L https://github.com/pisupply/pijuice/tarball/V1.8 | tar -xz && \
+        cd PiSupply-PiJuice-bc61c0f/Software/Source && \
+        python3 setup.py build && sudo python3 setup.py install && cd ../../.. && \
         pip3 install -r tests/requirements.txt && \
         pip3 install -r requirements.txt && \
         pip3 install -r core_services/sense/requirements.txt && \
