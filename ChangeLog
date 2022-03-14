@@ -1,6 +1,21 @@
 CHANGES
 =======
 
+* fix paths for requirements
+* restructure
+* Update dependency pytest to v7.1.0
+* don't ignore any paths
+* Update actions/checkout action to v3
+* Update dependency awscli to v1.22.73
+* remove repos after installing them for dependencies
+* remove incorrect path install
+* install more dependencies for tests
+* install services dependencies
+* prevent globbing
+* shellcheck
+* Add renovate.json
+* add core services and basic configuration and scripts
+* rename
 * try without installing package
 * more lint
 * lint
