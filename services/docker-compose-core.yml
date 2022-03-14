@@ -1,7 +1,7 @@
 version: "3"
 services:
-  power:
-    image: iqtlabs/pibackbone-power:stable
+  pijuice:
+    image: iqtlabs/pibackbone-pijuice:stable
     restart: always
     network_mode: "none"
     environment:
