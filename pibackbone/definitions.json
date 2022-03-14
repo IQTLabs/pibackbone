@@ -1,0 +1,12 @@
+{
+  "services": [
+    "pijuice",
+    "s3-upload",
+    "sense"
+  ],
+  "PiBuoy": [
+    "pijuice",
+    "s3-upload",
+    "sense"
+  ]
+}
