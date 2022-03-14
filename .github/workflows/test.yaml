@@ -32,12 +32,12 @@ jobs:
         rm -rf RTIMULib && \
         pip3 install -r tests/requirements.txt && \
         pip3 install -r requirements.txt && \
-        pip3 install -r core_services/sense/requirements.txt && \
-        pip3 install -r core_services/s3-upload/requirements.txt && \
+        pip3 install -r services/core/sense/requirements.txt && \
+        pip3 install -r services/core/s3-upload/requirements.txt && \
         export PYTHONPATH=$PWD/pibackbone:$PYTHONPATH && \
         pytype . && \
         pylint --fail-under=6.0 pibackbone && \
-        PATH=/home/runner/.local/bin:$PATH py.test -v -vv --capture=tee-sys --cov-report term-missing --cov=core_services --cov=pibackbone -c .coveragerc && \
+        PATH=/home/runner/.local/bin:$PATH py.test -v -vv --capture=tee-sys --cov-report term-missing --cov=services --cov=pibackbone -c .coveragerc && \
         PATH=/home/runner/.local/bin:$PATH coverage report && \
         PATH=/home/runner/.local/bin:$PATH coverage xml
     - name: Upload coverage to Codecov
