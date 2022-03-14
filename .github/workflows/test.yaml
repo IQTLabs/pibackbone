@@ -32,8 +32,8 @@ jobs:
         rm -rf RTIMULib && \
         pip3 install -r tests/requirements.txt && \
         pip3 install -r requirements.txt && \
-        pip3 install -r services/core/sense/requirements.txt && \
-        pip3 install -r services/core/s3-upload/requirements.txt && \
+        pip3 install -r services/sense/requirements.txt && \
+        pip3 install -r services/s3-upload/requirements.txt && \
         export PYTHONPATH=$PWD/pibackbone:$PYTHONPATH && \
         pytype . && \
         pylint --fail-under=6.0 pibackbone && \
