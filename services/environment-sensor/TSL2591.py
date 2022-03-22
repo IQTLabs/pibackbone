@@ -4,7 +4,7 @@
 import sys
 import time
 import math
-import smbus
+import smbus2 as smbus
 import RPi.GPIO as GPIO
 
 ADDR                = (0x29)
