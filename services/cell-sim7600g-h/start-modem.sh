@@ -40,10 +40,10 @@ else
         echo "Getting GPS"
         echo "Enabling tracking"
         resp=$(qmicli -d /dev/cdc-wdm0 -p --client-no-release-cid --loc-noop)
-        arrRESP=("${resp//\'/ }")
+        arrRESP=(${resp//\'/ })
         cid=${arrRESP[-1]}
         qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
-        qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-position-report > "$gpsdir/$gpsout" || true
+        qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-position-report > "$gpsdir/$gpsout"
         qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true
         echo "Sleeping..."
         sleep $GPS
