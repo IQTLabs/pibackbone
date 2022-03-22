@@ -1,12 +1,17 @@
 {
   "services": [
+    "cell-sim7600g-h",
+    "environment-sensor",
     "pijuice",
     "s3-upload",
-    "sense"
+    "sense",
+    "status-updater"
   ],
   "PiBuoy": [
+    "cell-sim7600g-h",
+    "environment-sensor",
     "pijuice",
     "s3-upload",
-    "sense"
+    "status-updater"
   ]
 }
