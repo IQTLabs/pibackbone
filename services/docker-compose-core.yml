@@ -1,5 +1,27 @@
 version: "3"
 services:
+  cell-sim7600g-h:
+    image: iqtlabs/pibackbone-cell-sim7600g-h:stable
+    restart: always
+    network_mode: host
+    privileged: true
+    environment:
+      - "HOSTNAME=${HOSTNAME}"
+    volumes:
+      - "/flash/telemetry/gps:/flash/telemetry/gps"
+      - "/sys:/sys"
+    command:
+      - fast.t-mobile.net
+      - 300
+  environment-sensor:
+    image: iqtlabs/pibackbone-environment-sensor:stable
+    restart: always
+    environment:
+      - "HOSTNAME=${HOSTNAME}"
+    volumes:
+      - "/flash/telemetry/sensors:/flash/telemetry/sensors"
+    devices:
+      - "/dev/i2c-1:/dev/i2c-1"
   pijuice:
     image: iqtlabs/pibackbone-pijuice:stable
     restart: always
@@ -23,21 +45,6 @@ services:
       - "/flash/telemetry:/flash/telemetry"
       - "/flash/s3:/flash/s3"
       - $HOME/.aws:/root/.aws:ro
-  sense:
-    image: iqtlabs/pibackbone-sense:stable
-    restart: always
-    # TODO find out what it actually needs
-    privileged: true
-    environment:
-      - "HOSTNAME=${HOSTNAME}"
-      - "LOCATION=${LOCATION}"
-      - "WEBHOOK_URL=${WEBHOOK_URL}"
-    volumes:
-      - "/flash:/flash"
-      - "/var/run:/var/run"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    devices:
-      - "/dev/i2c-1:/dev/i2c-1"
   watchtower:
     image: containrrr/watchtower:armhf-latest
     restart: always

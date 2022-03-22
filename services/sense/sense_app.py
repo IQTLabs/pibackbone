@@ -5,11 +5,7 @@ import socket
 import subprocess
 import time
 
-import docker
 from sense_hat import SenseHat  # pytype: disable=import-error
-
-from hooks import insert_message_data
-from hooks import send_hook
 
 
 # Raw colors
@@ -32,13 +28,9 @@ class Telemetry:
             self.CYCLES_BEFORE_STATUS_CHECK = self.MINUTES_BETWEEN_WAKES
 
         self.hostname = os.getenv("HOSTNAME", socket.gethostname())
-        self.location = os.getenv("LOCATION", "unknown")
-        self.version = os.getenv("VERSION", "")
         self.sensor_dir = os.path.join(base_dir, 'sensors')
         self.sense = None
         self.sensor_data = None
-        self.alerts = {}
-        self.docker = docker.from_env()
 
     def init_sense(self):
         self.sense = SenseHat()
@@ -118,35 +110,6 @@ class Telemetry:
         self.sensor_data["compass_z"].append([cz, timestamp])
         self.display(4, 4, blue)
 
-    @staticmethod
-    def check_internet():
-        try:
-            output = subprocess.check_output("/internet_check.sh")
-        except Exception as e:
-            print(f'Failed to check internet because: {e}')
-            output = b'Failed'
-
-        if b'Online' in output:
-            return True
-        return False
-
-    @staticmethod
-    def reorder_dots(files):
-        last_dot = -1
-        for i, f in enumerate(files):
-            if f.startswith('.'):
-                last_dot = i
-        last_dot += 1
-        files = files[last_dot:] + files[0:last_dot]
-        return files
-
-    def get_container_version(self, container):
-        env_vars = container.attrs['Config']['Env']
-        for env_var in env_vars:
-            if env_var.startswith("VERSION="):
-                return env_var.split("=")[-1]
-        return ""
-
     def init_sensor_data(self):
         self.sensor_data = {"temperature_c": [],
                             "pressure": [],
@@ -160,12 +123,6 @@ class Telemetry:
                             "compass_x": [],
                             "compass_y": [],
                             "compass_z": [],
-                            "system_load": [],
-                            "memory_used_mb": [],
-                            "internet": [],
-                            "disk_free_gb": [],
-                            "uptime_seconds": [],
-                            "version_sense": [],
                            }
 
     def rename_dotfiles(self):
@@ -181,105 +138,6 @@ class Telemetry:
                 record = {"target":key, "datapoints": self.sensor_data[key]}
                 f.write(f'{json.dumps(record)}\n')
         self.rename_dotfiles()
-        status = self.status_hook()
-        print(f'Status update response: {status}')
-
-    def shutdown_hook(self, subtitle):
-        data = {}
-        data['title'] = os.path.join(self.hostname, self.location)
-        data['themeColor'] = "d95f02"
-        data['body_title'] = "Shutting system down"
-        data['body_subtitle'] = subtitle
-        data['text'] = ""
-        data['facts'] = self.status_data()
-        card = insert_message_data(data)
-        status = send_hook(card)
-        return status
-
-    def status_hook(self):
-        checks = len(self.alerts)
-        health = 0
-        unhealthy = []
-        for alert in self.alerts:
-            if self.alerts[alert]:
-                unhealthy.append(alert)
-            else:
-                health += 1
-
-        data = {}
-        data['title'] = os.path.join(self.hostname, self.location)
-        data['body_title'] = "Status Update"
-        data['body_subtitle'] = f'{health} / {checks} checks healthy'
-        if health < checks:
-            data['themeColor'] = "d95f02"
-        data['text'] = f'Checks that alerted: {unhealthy}'
-        data['facts'] = self.status_data()
-        card = insert_message_data(data)
-        status = send_hook(card)
-        return status
-
-    def status_data(self):
-        facts = []
-        for key in self.sensor_data.keys():
-            if len(self.sensor_data[key]) > 0:
-                facts.append({"name": key, "value": str(self.sensor_data[key][-1][0])})
-        return facts
-
-    def run_checks(self, timestamp):
-        # internet: check if available
-        inet = self.check_internet()
-        self.sensor_data["internet"].append([inet, timestamp])
-        if inet:
-            self.display(5, 7, blue)
-            self.alerts['internet'] = False
-        else:
-            self.display(5, 7, red)
-            self.alerts['internet'] = True
-
-        # system health: load
-        load = os.getloadavg()
-        self.sensor_data["system_load"].append([load[0], timestamp])
-        if load[0] > 2:
-            self.display(6, 6, red)
-            self.alerts['system_load'] = True
-        elif load[0] > 1:
-            self.display(6, 6, yellow)
-            self.alerts['system_load'] = False
-        else:
-            self.display(6, 6, blue)
-            self.alerts['system_load'] = False
-
-        # system health: memory
-        total_memory, used_memory, free_memory = map(int, os.popen('free -t -m').readlines()[1].split()[1:4])
-        self.sensor_data["memory_used_mb"].append([used_memory, timestamp])
-        if used_memory/total_memory > 0.9:
-            self.display(5, 6, red)
-            self.alerts['memory_used_mb'] = True
-        elif used_memory/total_memory > 0.7:
-            self.display(5, 6, yellow)
-            self.alerts['memory_used_mb'] = False
-        else:
-            self.display(5, 6, blue)
-            self.alerts['memory_used_mb'] = False
-
-        # system health: disk space
-        st = os.statvfs('/')
-        bytes_avail = (st.f_bavail * st.f_frsize)
-        gb_free = round(bytes_avail / 1024 / 1024 / 1024, 1)
-        self.sensor_data["disk_free_gb"].append([gb_free, timestamp])
-        if gb_free < 2:
-            self.display(4, 6, red)
-            self.alerts['disk_free_gb'] = True
-        elif gb_free < 10:
-            self.display(4, 6, yellow)
-            self.alerts['disk_free_gb'] = False
-        else:
-            self.display(4, 6, blue)
-            self.alerts['disk_free_gb'] = False
-
-        # system uptime (linux only!)
-        self.sensor_data["uptime_seconds"].append([time.clock_gettime(time.CLOCK_BOOTTIME), timestamp])
-
 
     def main(self, run_forever):
         os.makedirs(self.sensor_dir, exist_ok=True)
@@ -310,32 +168,8 @@ class Telemetry:
             # TODO: write out data if exception with a try/except
             timestamp = int(time.time()*1000)
 
-            # If the middle button on the joystick is pressed, shutdown the system
-            for event in self.sense.stick.get_events():
-                if event.action == "released" and event.direction == "middle":
-                    user_shutdown = True
-                    self.shutdown_hook("User initiated")
-                    try:
-                        subprocess.run("/shutdown.sh")
-                    except Exception as e:
-                        print(f'Failed to shutdown because: {e}')
-
-            # Check if a shutdown has been signaled
-            signal_contents = ""
-            try:
-                with open('/var/run/shutdown.signal', 'r') as f:
-                    signal_contents = f.read()
-            except Exception as e:
-                pass
-
             # Light up top left pixel for cycle
             self.display(7, 7, blue)
-
-            if signal_contents.strip() == 'true':
-                self.display(7, 7, red)
-                if not user_shutdown:
-                    self.shutdown_hook("Low battery")
-                    user_shutdown = True
 
             if cycles == self.CYCLES_BEFORE_STATUS_CHECK or self.MINUTES_BETWEEN_WAKES > 1:
                 self.run_checks(timestamp)
