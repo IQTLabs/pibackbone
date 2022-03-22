@@ -37,11 +37,10 @@ else
         mkdir -p $gpsdir
         timestamp=$(date +%s)
         gpsout=$hostname-$timestamp-gps.txt
-        satout=$hostname-$timestamp-sat.txt
         echo "Getting GPS"
         echo "Enabling tracking"
         resp=$(qmicli -d /dev/cdc-wdm0 -p --client-no-release-cid --loc-noop)
-        arrRESP=(${resp//\'/ })
+        arrRESP=("${resp//\'/ }")
         cid=${arrRESP[-1]}
         qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
         qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-position-report > "$gpsdir/$gpsout"
