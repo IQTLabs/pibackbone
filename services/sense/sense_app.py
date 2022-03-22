@@ -81,13 +81,10 @@ class Telemetry:
         self.sensor_data["temperature_c"].append([t, timestamp])
         if t < 5 or t > 70:
             self.display(6, 3, red)
-            self.alerts['temperature_c'] = True
         elif t < 10 or t > 65:
             self.display(6, 3, yellow)
-            self.alerts['temperature_c'] = False
         else:
             self.display(6, 3, blue)
-            self.alerts['temperature_c'] = False
         p = self.get_pressure()
         self.sensor_data["pressure"].append([p, timestamp])
         self.display(5, 3, blue)
@@ -172,7 +169,6 @@ class Telemetry:
             self.display(7, 7, blue)
 
             if cycles == self.CYCLES_BEFORE_STATUS_CHECK or self.MINUTES_BETWEEN_WAKES > 1:
-                self.run_checks(timestamp)
                 cycles = 1
                 write_cycles += 1
 
