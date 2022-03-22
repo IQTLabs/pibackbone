@@ -1,6 +1,6 @@
 import time
 import math
-import smbus
+import smbus2 as smbus
 
 ADDR  = (0X53)
 

@@ -1,5 +1,5 @@
 #coding: utf-8
-import smbus
+import smbus2 as smbus
 import time
 
 I2C_ADDR = 0x76

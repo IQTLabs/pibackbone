@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 import time
-import smbus
+import smbus2 as smbus
 import math
 Gyro  = [0,0,0]
 Accel = [0,0,0]

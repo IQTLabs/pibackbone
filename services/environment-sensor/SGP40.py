@@ -6,7 +6,7 @@ import sys
 import time
 import math
 import struct
-import smbus
+import smbus2 as smbus
 # import ctypes
 
 # voc = ctypes.cdll.LoadLibrary('./voclib.so')
