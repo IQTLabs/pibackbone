@@ -1,7 +1,7 @@
 FROM python:3-slim
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 ENV PYTHONUNBUFFERED 1
-RUN apt-get update && apt-get install -y python3-smbus
+RUN apt-get update && apt-get install -y build-essential python3-smbus
 RUN python3 -m pip install -U pip
 WORKDIR /
 COPY requirements.txt requirements.txt
