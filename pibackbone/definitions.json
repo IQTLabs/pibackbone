@@ -1,7 +1,9 @@
 {
   "services": [
     "cell-sim7600g-h",
+    "daisy",
     "environment-sensor",
+    "hifiberry-dac-plus-adc-pro",
     "pijuice",
     "s3-upload",
     "sense",
@@ -9,7 +11,9 @@
   ],
   "PiBuoy": [
     "cell-sim7600g-h",
+    "daisy",
     "environment-sensor",
+    "hifiberry-dac-plus-adc-pro",
     "pijuice",
     "s3-upload",
     "status-updater"

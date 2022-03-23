@@ -53,6 +53,20 @@ jobs:
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-pijuice:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-pijuice:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
+        cd ../daisy && \
+        docker buildx build \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --push \
+          --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
+          -t iqtlabs/pibackbone-daisy:${{ steps.change_version.outputs.VERSION }} \
+          -t iqtlabs/pibackbone-daisy:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
+        cd ../hifiberry-dac-plus-adc-pro && \
+        docker buildx build \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --push \
+          --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
+          -t iqtlabs/pibackbone-hifiberry-dac-plus-adc-pro:${{ steps.change_version.outputs.VERSION }} \
+          -t iqtlabs/pibackbone-hifiberry-dac-plus-adc-pro:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
         cd ../status-updater && \
         docker buildx build \
           --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
