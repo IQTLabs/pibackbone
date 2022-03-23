@@ -113,8 +113,7 @@ class PiBackbone():
         with open('definitions.json', 'r') as f:
             self.definitions = json.load(f)
             self.services = self.definitions['services']
-            self.projects = list(self.definitions)
-            self.projects.remove('services')
+            self.projects = list(self.definitions['projects'])
             self.projects.append('None')
 
     def menu(self):
