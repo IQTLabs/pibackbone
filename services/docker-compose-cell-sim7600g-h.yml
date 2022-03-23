@@ -1,0 +1,16 @@
+version: "3"
+services:
+  cell-sim7600g-h:
+    image: iqtlabs/pibackbone-cell-sim7600g-h:stable
+    restart: always
+    network_mode: host
+    privileged: true
+    environment:
+      - "HOSTNAME=${HOSTNAME}"
+    volumes:
+      - "/flash/telemetry/gps:/flash/telemetry/gps"
+      - "/etc:/etc"
+      - "/sys:/sys"
+    command:
+      - fast.t-mobile.net
+      - "300"
