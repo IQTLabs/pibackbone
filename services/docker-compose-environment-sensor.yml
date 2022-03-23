@@ -1,0 +1,12 @@
+version: "3"
+services:
+  environment-sensor:
+    image: iqtlabs/pibackbone-environment-sensor:stable
+    restart: always
+    network_mode: "none"
+    environment:
+      - "HOSTNAME=${HOSTNAME}"
+    volumes:
+      - "/flash/telemetry/sensors:/flash/telemetry/sensors"
+    devices:
+      - "/dev/i2c-1:/dev/i2c-1"
