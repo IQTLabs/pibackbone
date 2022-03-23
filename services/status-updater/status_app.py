@@ -38,10 +38,16 @@ class Telemetry:
                 if container.name.startswith('services_'):
                     if container.status != 'running':
                         healthy = False
-                    self.sensor_data["version_"+container.name.split('_')[1]].append(
-                        [self.get_container_version(container), timestamp])
+                    if "version_"+container.name.split('_')[1] in self.sensor_data:
+                        self.sensor_data["version_"+container.name.split('_')[1]].append(
+                            [self.get_container_version(container), timestamp])
+                    else:
+                        self.sensor_data["version_"+container.name.split('_')[1]] = [self.get_container_version(container), timestamp]
             except Exception as e:
-                self.sensor_data["version_"+container.name.split('_')[1]].append([str(e), timestamp])
+                if "version_"+container.name.split('_')[1] in self.sensor_data:
+                    self.sensor_data["version_"+container.name.split('_')[1]].append([str(e), timestamp])
+                else:
+                    self.sensor_data["version_"+container.name.split('_')[1]] = [str(e), timestamp]
                 healthy = False
         return healthy
 
