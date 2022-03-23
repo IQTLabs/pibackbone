@@ -26,7 +26,6 @@ services:
   status-updater:
     image: iqtlabs/pibackbone-status-updater:stable
     restart: always
-    privileged: true
     environment:
       - "HOSTNAME=${HOSTNAME}"
       - "LOCATION=${LOCATION}"
