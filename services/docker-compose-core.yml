@@ -35,8 +35,7 @@ services:
       - "/var/run:/var/run"
       - "/var/run/docker.sock:/var/run/docker.sock"
   watchtower:
-    # TODO watchtower has different tags for armv7 than arm64 and armv6
-    image: containrrr/watchtower:armhf-latest
+    image: containrrr/watchtower:latest
     restart: always
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
