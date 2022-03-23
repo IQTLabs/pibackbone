@@ -30,6 +30,21 @@ class Telemetry:
         self.alerts = {}
         self.docker = docker.from_env()
 
+    def check_version(self, timestamp):
+        healthy = True
+        containers = self.docker.containers.list()
+        for container in containers:
+            try:
+                if container.name.startswith('services_'):
+                    if container.status != 'running':
+                        healthy = False
+                    self.sensor_data["version_"+container.name.split('_')[1]].append(
+                        [self.get_container_version(container), timestamp])
+            except Exception as e:
+                self.sensor_data["version_"+container.name.split('_')[1]].append([str(e), timestamp])
+                healthy = False
+        return healthy
+
     @staticmethod
     def check_internet():
         try:
@@ -111,6 +126,13 @@ class Telemetry:
             self.alerts['internet'] = False
         else:
             self.alerts['internet'] = True
+
+        # version and docker container health:
+        healthy = self.check_version(timestamp)
+        if healthy:
+            self.alerts['healthy'] = False
+        else:
+            self.alerts['healthy'] = True
 
         # system health: load
         load = os.getloadavg()
