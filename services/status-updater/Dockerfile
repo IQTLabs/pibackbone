@@ -9,7 +9,6 @@ RUN pip3 install -r requirements.txt
 COPY status_app.py /status_app.py
 COPY hooks.py /hooks.py
 COPY internet_check.sh /internet_check.sh
-COPY shutdown.sh /shutdown.sh
 ARG VERSION
 ENV VERSION $VERSION
 ENTRYPOINT ["python3", "/status_app.py"]

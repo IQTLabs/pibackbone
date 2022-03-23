@@ -9,7 +9,7 @@ services:
       - "HOSTNAME=${HOSTNAME}"
     volumes:
       - "/flash/telemetry/gps:/flash/telemetry/gps"
-      - "/etc:/etc"
+      - "/etc/resolv.conf:/etc/resolv.conf"
       - "/sys:/sys"
     command:
       - fast.t-mobile.net
