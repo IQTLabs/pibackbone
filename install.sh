@@ -32,6 +32,14 @@ sudo systemctl disable avahi-daemon.socket
 sudo systemctl disable apt-daily-upgrade.service
 sudo systemctl disable apt-daily-upgrade.timer
 
+# TODO change swap size to 8GB
+# sudo dphys-swapfile swapoff
+# sudo vi /etc/dphys-swapfile
+# CONF_SWAPSIZE=8192
+# sudo dphys-swapfile setup
+# sudo dphys-swapfile swapon
+# requires a reboot to take effect
+
 # set raspi-config options
 sudo cp config.txt /boot/config.txt
 sudo raspi-config nonint do_i2c 0
