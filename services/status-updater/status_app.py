@@ -26,6 +26,15 @@ class Telemetry:
         self.location = os.getenv("LOCATION", "unknown")
         self.version = os.getenv("VERSION", "")
         self.sensor_dir = os.path.join(base_dir, 'sensors')
+        self.ais_dir = os.path.join(base_dir, 'ais')
+        self.hydrophone_dir = os.path.join(base_dir, 'hydrophone')
+        self.power_dir = os.path.join(base_dir, 'power')
+        self.s3_dir = '/flash/s3'
+        self.ais_file = None
+        self.ais_records = 0
+        self.hydrophone_file = None
+        self.hydrophone_size = 0
+        self.power_file = None
         self.sensor_data = None
         self.alerts = {}
         self.docker = docker.from_env()
@@ -38,16 +47,16 @@ class Telemetry:
                 if container.name.startswith('services_'):
                     if container.status != 'running':
                         healthy = False
-                    if "version_"+container.name.split('_')[1] in self.sensor_data:
-                        self.sensor_data["version_"+container.name.split('_')[1]].append(
+                    if container.name.split('_')[1] in self.sensor_data:
+                        self.sensor_data[container.name.split('_')[1]].append(
                             [self.get_container_version(container), timestamp])
                     else:
-                        self.sensor_data["version_"+container.name.split('_')[1]] = [self.get_container_version(container), timestamp]
+                        self.sensor_data[container.name.split('_')[1]] = [[self.get_container_version(container), timestamp]]
             except Exception as e:
-                if "version_"+container.name.split('_')[1] in self.sensor_data:
-                    self.sensor_data["version_"+container.name.split('_')[1]].append([str(e), timestamp])
+                if container.name.split('_')[1] in self.sensor_data:
+                    self.sensor_data[container.name.split('_')[1]].append([str(e), timestamp])
                 else:
-                    self.sensor_data["version_"+container.name.split('_')[1]] = [str(e), timestamp]
+                    self.sensor_data[container.name.split('_')[1]] = [[str(e), timestamp]]
                 healthy = False
         return healthy
 
@@ -68,7 +77,88 @@ class Telemetry:
         for env_var in env_vars:
             if env_var.startswith("VERSION="):
                 return env_var.split("=")[-1]
-        return ""
+        return container.image.tags[0].split(':')[1]
+
+    @staticmethod
+    def reorder_dots(files):
+        last_dot = -1
+        for i, f in enumerate(files):
+            if f.startswith('.'):
+                last_dot = i
+        last_dot += 1
+        files = files[last_dot:] + files[0:last_dot]
+        return files
+
+    def check_ais(self):
+        # check for new files, in the newest file, check if the number of lines has increased
+        files = sorted([f for f in os.listdir(self.ais_dir) if os.path.isfile(os.path.join(self.ais_dir, f))])
+
+        # check for dotfiles
+        files = self.reorder_dots(files)
+
+        if not files:
+            self.ais_file = None
+            self.ais_records = 0
+            return False
+        elif os.path.join(self.ais_dir, files[-1]) != self.ais_file:
+            self.ais_file = os.path.join(self.ais_dir, files[-1])
+            self.ais_records = sum(1 for line in open(self.ais_file))
+            return True
+        # file already exists, check if there's new records
+        num_lines = sum(1 for line in open(self.ais_file))
+        if num_lines > self.ais_records:
+            self.ais_records = num_lines
+            return True
+        return False
+
+    def check_power(self):
+        files = sorted([f for f in os.listdir(self.power_dir) if os.path.isfile(os.path.join(self.power_dir, f))])
+
+        # check for dotfiles
+        files = self.reorder_dots(files)
+
+        if not files:
+            self.power_file = None
+            return
+        elif os.path.join(self.power_dir, files[-1]) != self.power_file:
+            self.power_file = os.path.join(self.power_dir, files[-1])
+        with open(self.power_file, 'r') as f:
+            for line in f:
+                record = json.loads(line.strip())
+                if record['target'] in self.sensor_data:
+                    self.sensor_data[record['target']].append(record['datapoints'][-1])
+                else:
+                    self.sensor_data[record['target']] = [record['datapoints'][-1]]
+
+    def check_hydrophone(self):
+        files = sorted([f for f in os.listdir(self.hydrophone_dir) if os.path.isfile(os.path.join(self.hydrophone_dir, f))])
+
+        # check for dotfiles
+        files = self.reorder_dots(files)
+
+        # no files
+        if not files:
+            self.hydrophone_file = None
+            self.hydrophone_size = 0
+            return False
+        # found a new file
+        elif os.path.join(self.hydrophone_dir, files[-1]) != self.hydrophone_file:
+            self.hydrophone_file = os.path.join(self.hydrophone_dir, files[-1])
+            self.hydrophone_size = os.path.getsize(self.hydrophone_file)
+            return True
+        # file already exists, check the size
+        size = os.path.getsize(self.hydrophone_file)
+        if size > self.hydrophone_size:
+            self.hydrophone_size = size
+            return True
+        return False
+
+    def check_s3(self):
+        files = sorted([f for f in os.listdir(self.s3_dir) if os.path.isfile(os.path.join(self.s3_dir, f))])
+        if not files:
+            return False, 0
+        else:
+            return True, len(files)
 
     def init_sensor_data(self):
         self.sensor_data = {"system_load": [],
@@ -140,6 +230,45 @@ class Telemetry:
         else:
             self.alerts['healthy'] = True
 
+        # ais: see if new detection since last cycle
+        ais = self.check_ais()
+        if ais:
+            if "ais_record" in self.sensor_data:
+                self.sensor_data["ais_record"].append([ais, timestamp])
+            else:
+                self.sensor_data["ais_record"] = [[ais, timestamp]]
+
+        # recordings: see if new recording file since last session, or if more bytes have been written
+        hydrophone = self.check_hydrophone()
+        if hydrophone:
+            if "audio_record" in self.sensor_data:
+                self.sensor_data["audio_record"].append([hydrophone, timestamp])
+            else:
+                self.sensor_data["audio_record"] = [[hydrophone, timestamp]]
+
+        # files to upload to s3
+        s3, s3_files = self.check_s3()
+        if s3:
+            if "files_to_upload" in self.sensor_data:
+                self.sensor_data["files_to_upload"].append([s3_files, timestamp])
+            else:
+                self.sensor_data["files_to_upload"] = [[s3_files, timestamp]]
+
+        # battery: check current battery level from pijuice hopefully, change color based on level
+        self.check_power()
+        if 'battery_status' in self.sensor_data:
+            if len(self.sensor_data['battery_status']) > 0:
+                if self.sensor_data['battery_status'][-1][0] in ['NORMAL', 'CHARGING_FROM_IN']:
+                    self.alerts['battery_status'] = False
+                else:
+                    self.alerts['battery_status'] = True
+        if 'battery_charge' in self.sensor_data:
+            if len(self.sensor_data['battery_charge']) > 0:
+                if int(self.sensor_data['battery_charge'][-1][0]) > 20:
+                    self.alerts['battery_charge'] = False
+                else:
+                    self.alerts['battery_charge'] = True
+        
         # system health: load
         load = os.getloadavg()
         self.sensor_data["system_load"].append([load[0], timestamp])
@@ -175,9 +304,7 @@ class Telemetry:
         # system uptime (linux only!)
         self.sensor_data["uptime_seconds"].append([time.clock_gettime(time.CLOCK_BOOTTIME), timestamp])
 
-
     def main(self, run_forever):
-        os.makedirs(self.sensor_dir, exist_ok=True)
         self.init_sensor_data()
 
         # Cycle through getting readings forever
