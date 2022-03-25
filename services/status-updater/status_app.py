@@ -38,6 +38,7 @@ class Telemetry:
         self.hydrophone_size = 0
         self.power_file = None
         self.sensor_file = None
+        self.sensor_data = {}
         self.alerts = {}
         self.docker = docker.from_env()
 
