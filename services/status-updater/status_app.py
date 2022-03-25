@@ -27,15 +27,18 @@ class Telemetry:
         self.version = os.getenv("VERSION", "")
         self.sensor_dir = os.path.join(base_dir, 'sensors')
         self.ais_dir = os.path.join(base_dir, 'ais')
+        self.gps_dir = os.path.join(base_dir, 'gps')
         self.hydrophone_dir = os.path.join(base_dir, 'hydrophone')
         self.power_dir = os.path.join(base_dir, 'power')
         self.s3_dir = '/flash/s3'
         self.ais_file = None
         self.ais_records = 0
+        self.gps_file = None
         self.hydrophone_file = None
         self.hydrophone_size = 0
         self.power_file = None
-        self.sensor_data = None
+        self.sensor_file = None
+        self.sensor_data = {}
         self.alerts = {}
         self.docker = docker.from_env()
 
@@ -110,6 +113,74 @@ class Telemetry:
             self.ais_records = num_lines
             return True
         return False
+
+    def check_gps(self, timestamp):
+        files = sorted([f for f in os.listdir(self.gps_dir) if os.path.isfile(os.path.join(self.gps_dir, f))])
+
+        # check for dotfiles
+        files = self.reorder_dots(files)
+
+        if not files:
+            self.gps_file = None
+            return
+        elif os.path.join(self.gps_dir, files[-1]) != self.gps_file:
+            self.gps_file = os.path.join(self.gps_dir, files[-1])
+        with open(self.gps_file, 'r') as f:
+            for line in f:
+                if 'status:' in line:
+                    if 'gps_status' in self.sensor_data:
+                        self.sensor_data['gps_status'].append([line.split('status:')[-1].strip(), timestamp])
+                    else:
+                        self.sensor_data['gps_status'] = [[line.split('status:')[-1].strip(), timestamp]]
+                elif 'latitude:' in line:
+                    if 'latitude' in self.sensor_data:
+                        self.sensor_data['latitude'].append([line.split('latitude:')[-1].split('degrees')[0].strip(), timestamp])
+                    else:
+                        self.sensor_data['latitude'] = [[line.split('latitude:')[-1].split('degrees')[0].strip(), timestamp]]
+                elif 'longitude:' in line:
+                    if 'longitude' in self.sensor_data:
+                        self.sensor_data['longitude'].append([line.split('longitude:')[-1].split('degrees')[0].strip(), timestamp])
+                    else:
+                        self.sensor_data['longitude'] = [[line.split('longitude:')[-1].split('degrees')[0].strip(), timestamp]]
+                elif 'circular horizontal position uncertainty:' in line:
+                    if 'position_uncertainty_meters' in self.sensor_data:
+                        self.sensor_data['position_uncertainty_meters'].append([line.split('circular horizontal position uncertainty:')[-1].split('meters')[0].strip(), timestamp])
+                    else:
+                        self.sensor_data['position_uncertainty_meters'] = [[line.split('circular horizontal position uncertainty:')[-1].split('meters')[0].strip(), timestamp]]
+                elif 'technology:' in line:
+                    if 'gps_technology' in self.sensor_data:
+                        self.sensor_data['gps_technology'].append([line.split('technology:')[-1].strip(), timestamp])
+                    else:
+                        self.sensor_data['gps_technology'] = [[line.split('technology:')[-1].strip(), timestamp]]
+                elif 'Fix count:' in line:
+                    if 'gps_fix_count' in self.sensor_data:
+                        self.sensor_data['gps_fix_count'].append([line.split('Fix count:')[-1].strip(), timestamp])
+                    else:
+                        self.sensor_data['gps_fix_count'] = [[line.split('Fix count:')[-1].strip(), timestamp]]
+                elif 'Satellites used:' in line:
+                    if 'gps_sats' in self.sensor_data:
+                        self.sensor_data['gps_sats'].append([line.split('Satellites used:')[-1].strip(), timestamp])
+                    else:
+                        self.sensor_data['gps_sats'] = [[line.split('Satellites used:')[-1].strip(), timestamp]]
+
+    def check_sensor(self):
+        files = sorted([f for f in os.listdir(self.sensor_dir) if os.path.isfile(os.path.join(self.sensor_dir, f))])
+
+        # check for dotfiles
+        files = self.reorder_dots(files)
+
+        if not files:
+            self.sensor_file = None
+            return
+        elif os.path.join(self.sensor_dir, files[-1]) != self.sensor_file:
+            self.sensor_file = os.path.join(self.sensor_dir, files[-1])
+        with open(self.sensor_file, 'r') as f:
+            for line in f:
+                record = json.loads(line.strip())
+                if record['target'] in self.sensor_data:
+                    self.sensor_data[record['target']].append(record['datapoints'][-1])
+                else:
+                    self.sensor_data[record['target']] = [record['datapoints'][-1]]
 
     def check_power(self):
         files = sorted([f for f in os.listdir(self.power_dir) if os.path.isfile(os.path.join(self.power_dir, f))])
@@ -268,6 +339,24 @@ class Telemetry:
                     self.alerts['battery_charge'] = False
                 else:
                     self.alerts['battery_charge'] = True
+
+        # sensor readings: temp, humidity, pressure, lux, uv, gas, 9DOF
+        self.check_sensor()
+        if 'temperature_c' in self.sensor_data:
+            if len(self.sensor_data['temperature_c']) > 0:
+                if self.sensor_data['temperature_c'][-1][0] < 10 or self.sensor_data['temperature_c'][-1][0] > 65:
+                    self.alerts['temperature_c'] = True
+                else:
+                    self.alerts['temperature_c'] = False
+
+        # gps readings
+        self.check_gps(timestamp)
+        if 'gps_status' in self.sensor_data:
+            if len(self.sensor_data['gps_status']) > 0:
+                if self.sensor_data['gps_status'][-1][0] == 'success':
+                    self.alerts['gps_status'] = False
+                else:
+                    self.alerts['gps_status'] = True
         
         # system health: load
         load = os.getloadavg()
