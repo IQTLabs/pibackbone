@@ -44,9 +44,9 @@ else
         cid=${arrRESP[-1]}
         qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
         qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-position-report > "$gpsdir/$gpsout"
-        qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true
         echo "Sleeping..."
         sleep $GPS
+        qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true
     done
 fi
 echo "Exiting..."
