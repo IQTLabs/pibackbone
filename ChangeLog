@@ -1,6 +1,9 @@
 CHANGES
 =======
 
+* add back more status checks
+* Update dependency awscli to v1.22.80
+* fix project list
 * specify config per board
 * ensure keys exist
 * add versions of container status

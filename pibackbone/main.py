@@ -65,7 +65,6 @@ class PiBackbone():
                 'name': 'project',
                 'message': 'What project would you like to build?',
                 'choices': self.projects,
-                'filter': lambda val: val.lower(),
             },
         ]
 
@@ -82,6 +81,10 @@ class PiBackbone():
                 'choices': service_choices,
             },
         ]
+
+    def quit(self):
+        self.reset_cwd()
+        sys.exit(1)
 
     @staticmethod
     def _check_conf_dir(conf_dir):
@@ -103,7 +106,7 @@ class PiBackbone():
         except Exception as err:  # pragma: no cover
             logging.error(
                 'Unable to find config files, exiting because: %s', err)
-            sys.exit(1)
+            self.quit()
 
     def reset_cwd(self):
         """Set the current working directory back to what it was originally"""
@@ -123,6 +126,43 @@ class PiBackbone():
             answer = self.execute_prompt(self.project_question())
         else:
             answer = self.execute_prompt(self.services_question())
+        return answer
+
+    def parse_answer(self, answer):
+        """Parse out answer"""
+        print(answer)
+        if 'project' in answer:
+            if answer['project'] == 'None':
+                logging.info("Nothing chosen, quitting.")
+                self.quit()
+            print(self.definitions['projects'][answer['project']])
+        elif 'services' in answer:
+            if not answer['services']:
+                logging.info("Nothing chosen, quitting.")
+                self.quit()
+            for service in answer['services']:
+                print(self.definitions['services'][service])
+        else:
+            logging.error(f'Invalid choices in answer: {answer}')
+            self.quit()
+
+    def install_requirements(self):
+        """Install requirements of choices made"""
+        # TODO check for crons to install
+        # TODO install things to config.txt
+        pass
+
+    def apply_secrets(self):
+        """Set secret information specific to the deployment"""
+        pass
+
+    def start_services(self):
+        """Start services that were requested"""
+        pass
+
+    def reboot(self):
+        """Reboot the machine"""
+        pass
 
     def main(self):
         """Main entrypoint to the class, parse args and main program driver"""
@@ -139,5 +179,9 @@ class PiBackbone():
         # TODO do something with args
         self.set_config_dir()
         self.get_definitions()
-        self.menu()
+        self.parse_answer(self.menu())
+        # TODO install requirements
+        # TODO get secrets and apply them, AWS, webhooks, .env, etc.
+        # TODO start services
         self.reset_cwd()
+        # TODO ask to reboot, reboot if yes
