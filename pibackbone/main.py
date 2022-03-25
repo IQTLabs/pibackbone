@@ -131,6 +131,7 @@ class PiBackbone():
     def parse_answer(self, answer):
         """Parse out answer"""
         print(answer)
+        services = []
         if 'project' in answer:
             if answer['project'] == 'None':
                 logging.info("Nothing chosen, quitting.")
@@ -145,6 +146,7 @@ class PiBackbone():
         else:
             logging.error(f'Invalid choices in answer: {answer}')
             self.quit()
+        return services
 
     def install_requirements(self):
         """Install requirements of choices made"""
@@ -154,10 +156,16 @@ class PiBackbone():
 
     def apply_secrets(self):
         """Set secret information specific to the deployment"""
+        # TODO if s3, ask for aws creds, or look for env vars, ask for bucket name, ask for default region
+        # TODO if status-updater ask for webhook url
+        # TODO ask for device name
+        # TODO ask for location of deployment
         pass
 
     def start_services(self):
         """Start services that were requested"""
+        # TODO collect required compose files, and start with compose
+        # TODO ask if you want watchtower to do automatic updates for you
         pass
 
     def reboot(self):
@@ -168,6 +176,7 @@ class PiBackbone():
         """Main entrypoint to the class, parse args and main program driver"""
         parser = argparse.ArgumentParser(prog='PiBackbone',
                                          description='PiBackbone - A tool for installing the basic required subsystems on a Pi-based project')
+        # TODO add option to self update pibackbone
         # TODO set log level
         parser.add_argument('--verbose', '-v', choices=[
                             'DEBUG', 'INFO', 'WARNING', 'ERROR'],
@@ -179,7 +188,7 @@ class PiBackbone():
         # TODO do something with args
         self.set_config_dir()
         self.get_definitions()
-        self.parse_answer(self.menu())
+        services = self.parse_answer(self.menu())
         # TODO install requirements
         # TODO get secrets and apply them, AWS, webhooks, .env, etc.
         # TODO start services

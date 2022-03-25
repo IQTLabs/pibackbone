@@ -45,7 +45,7 @@
         "s3-upload",
         "status-updater"
       ],
-      "notes": "The PiJuice needs it's RTC I2C address changed from 68 to 69 in pijuice_cli to remove a conflict with the Environment Sensor HAT. Also ensure the Pijuice is running the latest firmware. The dAISy HAT needs pin 12 removed between it and the Pi to prevent conflicts created by the HiFiBerry HAT. The Cellular SIM7600G-H HAT should be attached only over USB to the Pi directly."
+      "notes": "The PiJuice needs it's RTC I2C address changed from 68 to 69 in pijuice_cli to remove a conflict with the Environment Sensor HAT. Also ensure the Pijuice is running the latest firmware. The dAISy HAT needs pin 12 removed between it and the Pi to prevent conflicts created by the HiFiBerry HAT. The Cellular SIM7600G-H HAT should be attached only over USB to the Pi directly. Plug in the hydrophone to the HiFiBerry HAT prior to turning on for more reliable recording volume."
     }
   }
 }
