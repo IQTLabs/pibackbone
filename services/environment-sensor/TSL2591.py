@@ -101,7 +101,7 @@ class TSL2591:
         # self.Write_Byte(ENABLE_REGISTER, ENABLE_POWERON | ENABLE_AEN)
         self.Write_Byte(ENABLE_REGISTER, ENABLE_AIEN | ENABLE_POWERON | ENABLE_AEN | ENABLE_NPIEN)
         self.IntegralTime = ATIME_200MS
-        self.Gain = MEDIUM_AGAIN
+        self.Gain = LOW_AGAIN
         self.Write_Byte(CONTROL_REGISTER, self.IntegralTime | self.Gain)
         self.Write_Byte(PERSIST_REGISTER, 0x01)
         # self.Write_Byte(0xE7, 0x13)
