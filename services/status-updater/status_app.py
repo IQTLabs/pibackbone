@@ -44,12 +44,14 @@ class Telemetry:
 
     def check_version(self, timestamp):
         healthy = True
+        unhealthy_containers = []
         containers = self.docker.containers.list()
         for container in containers:
             try:
                 if container.name.startswith('services_'):
                     if container.status != 'running':
                         healthy = False
+                        unhealthy_containers.append(container.name.split('_')[1])
                     if container.name.split('_')[1] in self.sensor_data:
                         self.sensor_data[container.name.split('_')[1]].append(
                             [self.get_container_version(container), timestamp])
@@ -61,6 +63,10 @@ class Telemetry:
                 else:
                     self.sensor_data[container.name.split('_')[1]] = [[str(e), timestamp]]
                 healthy = False
+        if 'unhealthy_containers' in self.sensor_data:
+            self.sensor_data['unhealthy_containers'].append([unhealthy_containers, timestamp])
+        else:
+            self.sensor_data['unhealthy_containers'] = [[unhealthy_containers, timestamp]]
         return healthy
 
     @staticmethod
@@ -152,11 +158,6 @@ class Telemetry:
                         self.sensor_data['gps_technology'].append([line.split('technology:')[-1].strip(), timestamp])
                     else:
                         self.sensor_data['gps_technology'] = [[line.split('technology:')[-1].strip(), timestamp]]
-                elif 'Fix count:' in line:
-                    if 'gps_fix_count' in self.sensor_data:
-                        self.sensor_data['gps_fix_count'].append([line.split('Fix count:')[-1].strip(), timestamp])
-                    else:
-                        self.sensor_data['gps_fix_count'] = [[line.split('Fix count:')[-1].strip(), timestamp]]
                 elif 'Satellites used:' in line:
                     if 'gps_sats' in self.sensor_data:
                         self.sensor_data['gps_sats'].append([line.split('Satellites used:')[-1].strip(), timestamp])
