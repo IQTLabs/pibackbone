@@ -114,6 +114,9 @@ class TSL2591:
         elif self.Gain == MAX_AGAIN:
             again = 9876.0
         self.Cpl = (atime * again) / LUX_DF
+        if self.Cpl == 0:
+            # prevent divided by zero errors
+            self.Cpl = 0.001
 
     def Read_Byte(self, Addr):
         Addr = (COMMAND_BIT | Addr) & 0xFF
