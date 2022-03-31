@@ -185,7 +185,7 @@ class PiBackbone():
         # TODO ask if you want watchtower to do automatic updates for you
         pass
 
-    def output_notes(self):
+    def output_notes(self, project):
         """Output any notes if a project was chosen and has notes"""
         pass
 
