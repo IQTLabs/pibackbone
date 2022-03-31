@@ -1,3 +1,4 @@
+import copy
 import glob
 import json
 import os
@@ -251,8 +252,8 @@ class Telemetry:
     def write_sensor_data(self, timestamp):
         status = self.status_hook()
         tmp_filename = f'{self.status_dir}/.status-{self.hostname}-{timestamp}.json'
-        payload = self.sensor_data
-        payload['alerts'] = self.alerts
+        payload = copy.deepcopy(self.sensor_data)
+        payload['alerts'] = copy.deepcopy(self.alerts)
         with open(tmp_filename, 'w') as f:
             json.dump(payload)
         self.rename_dotfiles()
