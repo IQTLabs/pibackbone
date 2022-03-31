@@ -85,19 +85,21 @@ class PiBackbone():
         ]
 
     def quit(self):
+        """Reset the working directory and exit the program"""
         self.reset_cwd()
         sys.exit(1)
 
     @staticmethod
     def _check_conf_dir(conf_dir):
+        """Check the conf directory is valid"""
         realpath = os.path.realpath(conf_dir)
         if not realpath.endswith('/pibackbone'):
             raise ValueError(
-                'last element of conf_dir must be pibackbone: %s' % realpath)
+                f'last element of conf_dir must be pibackbone: {realpath}')
         for valid_prefix in ('/usr/local', '/opt', '/home', '/Users'):
             if realpath.startswith(valid_prefix):
                 return realpath
-        raise ValueError('conf_dir root may not be safe: %s' % realpath)
+        raise ValueError(f'conf_dir root may not be safe: {realpath}')
 
     def set_config_dir(self, conf_dir='/opt/pibackbone'):
         """Set the current working directory to where the configs are"""
@@ -116,8 +118,8 @@ class PiBackbone():
 
     def get_definitions(self):
         """Get definitions of services and projects"""
-        with open('definitions.json', 'r') as f:
-            self.definitions = json.load(f)
+        with open('definitions.json', 'r') as file_handler:
+            self.definitions = json.load(file_handler)
             self.services = self.definitions['services']
             self.projects = list(self.definitions['projects'])
             self.projects.append('None')
@@ -131,7 +133,8 @@ class PiBackbone():
             answer = self.execute_prompt(self.services_question())
         return answer
 
-    def reboot_question(self):
+    @staticmethod
+    def reboot_question():
         """Ask if they would like to reboot the machine"""
         return [
             {
@@ -158,7 +161,7 @@ class PiBackbone():
             for service in answer['services']:
                 print(self.definitions['services'][service])
         else:
-            logging.error(f'Invalid choices in answer: {answer}')
+            logging.error('Invalid choices in answer: %s', answer)
             self.quit()
         return services
 
@@ -181,7 +184,8 @@ class PiBackbone():
         # TODO ask if you want watchtower to do automatic updates for you
         pass
 
-    def restart(self):
+    @staticmethod
+    def restart():
         """Restart the machine"""
         sudo[reboot]()
 
