@@ -253,7 +253,7 @@ class Telemetry:
         status = self.status_hook()
         tmp_filename = f'{self.status_dir}/.status-{self.hostname}-{timestamp}.json'
         payload = copy.deepcopy(self.sensor_data)
-        payload['alerts'] = copy.deepcopy(self.alerts)
+        payload['alerts'] = json.loads(json.dumps(self.alerts))
         with open(tmp_filename, 'w') as f:
             json.dump(payload, f)
         self.rename_dotfiles()
