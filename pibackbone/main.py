@@ -9,10 +9,12 @@ import sys
 
 #import docker
 from examples import custom_style_2
-#from plumbum import FG  # pytype: disable=import-error
-#from plumbum import local  # pytype: disable=import-error
-#from plumbum import TF  # pytype: disable=import-error
-#from plumbum.cmd import docker_compose  # pytype: disable=import-error
+from plumbum import FG  # pytype: disable=import-error
+from plumbum import local  # pytype: disable=import-error
+from plumbum import TF  # pytype: disable=import-error
+from plumbum.cmd import docker_compose  # pytype: disable=import-error # pylint: disable=import-error
+from plumbum.cmd import reboot  # pytype: disable=import-error # pylint: disable=import-error
+from plumbum.cmd import sudo  # pytype: disable=import-error # pylint: disable=import-error
 from PyInquirer import prompt
 
 from pibackbone import __file__
@@ -83,19 +85,21 @@ class PiBackbone():
         ]
 
     def quit(self):
+        """Reset the working directory and exit the program"""
         self.reset_cwd()
         sys.exit(1)
 
     @staticmethod
     def _check_conf_dir(conf_dir):
+        """Check the conf directory is valid"""
         realpath = os.path.realpath(conf_dir)
         if not realpath.endswith('/pibackbone'):
             raise ValueError(
-                'last element of conf_dir must be pibackbone: %s' % realpath)
+                f'last element of conf_dir must be pibackbone: {realpath}')
         for valid_prefix in ('/usr/local', '/opt', '/home', '/Users'):
             if realpath.startswith(valid_prefix):
                 return realpath
-        raise ValueError('conf_dir root may not be safe: %s' % realpath)
+        raise ValueError(f'conf_dir root may not be safe: {realpath}')
 
     def set_config_dir(self, conf_dir='/opt/pibackbone'):
         """Set the current working directory to where the configs are"""
@@ -113,8 +117,9 @@ class PiBackbone():
         os.chdir(self.previous_dir)
 
     def get_definitions(self):
-        with open('definitions.json', 'r') as f:
-            self.definitions = json.load(f)
+        """Get definitions of services and projects"""
+        with open('definitions.json', 'r') as file_handler:
+            self.definitions = json.load(file_handler)
             self.services = self.definitions['services']
             self.projects = list(self.definitions['projects'])
             self.projects.append('None')
@@ -128,38 +133,50 @@ class PiBackbone():
             answer = self.execute_prompt(self.services_question())
         return answer
 
+    @staticmethod
+    def reboot_question():
+        """Ask if they would like to reboot the machine"""
+        return [
+            {
+                'type': 'confirm',
+                'name': 'reboot_machine',
+                'message': 'Do you want to reboot this machine now? (Recommended as some changes require a reboot to take effect)',
+                'default': True,
+            },
+        ]
+
     def parse_answer(self, answer):
         """Parse out answer"""
         print(answer)
         services = []
+        project = ""
         if 'project' in answer:
             if answer['project'] == 'None':
                 logging.info("Nothing chosen, quitting.")
                 self.quit()
+            # TODO get services in project and add to list
+            project = answer['project']
             print(self.definitions['projects'][answer['project']])
         elif 'services' in answer:
             if not answer['services']:
                 logging.info("Nothing chosen, quitting.")
                 self.quit()
             for service in answer['services']:
-                print(self.definitions['services'][service])
+                services.append(service)
         else:
-            logging.error(f'Invalid choices in answer: {answer}')
+            logging.error('Invalid choices in answer: %s', answer)
             self.quit()
-        return services
+        return services, project
 
-    def install_requirements(self):
+    def install_requirements(self, services):
         """Install requirements of choices made"""
-        # TODO check for crons to install
         # TODO install things to config.txt
         pass
 
     def apply_secrets(self):
         """Set secret information specific to the deployment"""
-        # TODO if s3, ask for aws creds, or look for env vars, ask for bucket name, ask for default region
-        # TODO if status-updater ask for webhook url
-        # TODO ask for device name
-        # TODO ask for location of deployment
+        # TODO if s3, ask for aws creds
+        # TODO for line in .env ask to apply a value
         pass
 
     def start_services(self):
@@ -168,29 +185,33 @@ class PiBackbone():
         # TODO ask if you want watchtower to do automatic updates for you
         pass
 
-    def reboot(self):
-        """Reboot the machine"""
+    def output_notes(self, project):
+        """Output any notes if a project was chosen and has notes"""
         pass
+
+    @staticmethod
+    def restart():
+        """Restart the machine"""
+        sudo[reboot]()
 
     def main(self):
         """Main entrypoint to the class, parse args and main program driver"""
         parser = argparse.ArgumentParser(prog='PiBackbone',
                                          description='PiBackbone - A tool for installing the basic required subsystems on a Pi-based project')
         # TODO add option to self update pibackbone
-        # TODO set log level
-        parser.add_argument('--verbose', '-v', choices=[
-                            'DEBUG', 'INFO', 'WARNING', 'ERROR'],
-                            default='INFO',
-                            help='logging level (default=INFO)')
         parser.add_argument('--version', '-V', action='version',
                             version=f'%(prog)s {__version__}')
         args = parser.parse_args(self.raw_args)
-        # TODO do something with args
         self.set_config_dir()
         self.get_definitions()
-        services = self.parse_answer(self.menu())
-        # TODO install requirements
-        # TODO get secrets and apply them, AWS, webhooks, .env, etc.
-        # TODO start services
+        services, project = self.parse_answer(self.menu())
+        self.install_requirements(services)
+        self.apply_secrets()
+        self.start_services()
+        if project:
+            self.output_notes(project)
         self.reset_cwd()
-        # TODO ask to reboot, reboot if yes
+
+        answer = self.execute_prompt(self.reboot_question())
+        if 'reboot_machine' in answer and answer['reboot_machine']:
+            self.restart()

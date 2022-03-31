@@ -20,7 +20,7 @@ cd /opt
 git clone https://github.com/iqtlabs/pibackbone 
 cd pibackbone
 pip3 install .
-sudo cp scripts/pibackbone_cron /etc/cron.d/pibackbone
+sudo cp scripts/cron.d/* /etc/cron.d/
 
 # disable unneeded services
 sudo systemctl stop avahi-daemon.service
