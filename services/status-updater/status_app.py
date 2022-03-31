@@ -26,6 +26,7 @@ class Telemetry:
         self.location = os.getenv("LOCATION", "unknown")
         self.version = os.getenv("VERSION", "")
         self.sensor_dir = os.path.join(base_dir, 'sensors')
+        self.status_dir = os.path.join(base_dir, 'status')
         self.ais_dir = os.path.join(base_dir, 'ais')
         self.gps_dir = os.path.join(base_dir, 'gps')
         self.hydrophone_dir = os.path.join(base_dir, 'hydrophone')
@@ -241,8 +242,20 @@ class Telemetry:
                             "version_sense": [],
                            }
 
+    def rename_dotfiles(self):
+        for dotfile in glob.glob(os.path.join(self.status_dir, '.*')):
+            basename = os.path.basename(dotfile)
+            non_dotfile = os.path.join(self.status_dir, basename[1:])
+            os.rename(dotfile, non_dotfile)
+
     def write_sensor_data(self, timestamp):
         status = self.status_hook()
+        tmp_filename = f'{self.status_dir}/.status-{self.hostname}-{timestamp}.json'
+        payload = self.sensor_data
+        payload['alerts'] = self.alerts
+        with open(tmp_filename, 'w') as f:
+            json.dump(payload)
+        self.rename_dotfiles()
         print(f'Status update response: {status}')
 
     def shutdown_hook(self, subtitle):
