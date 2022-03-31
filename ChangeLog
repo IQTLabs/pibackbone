@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+* linting
+* small improvements
+* Update dependency pylint to v2.13.4
+* Update dependency awscli to v1.22.85
+* Update dependency pytype to v2022.3.29
+* Update dependency awscli to v1.22.84
 * prevent divide by zero
 * Update dependency pylint to v2.13.3
 * more status checks; set lux to low for value overflow

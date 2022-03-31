@@ -12,9 +12,9 @@ from examples import custom_style_2
 from plumbum import FG  # pytype: disable=import-error
 from plumbum import local  # pytype: disable=import-error
 from plumbum import TF  # pytype: disable=import-error
-from plumbum.cmd import docker_compose  # pytype: disable=import-error
-from plumbum.cmd import reboot  # pytype: disable=import-error
-from plumbum.cmd import sudo  # pytype: disable=import-error
+from plumbum.cmd import docker_compose  # pytype: disable=import-error # pylint: disable=import-error
+from plumbum.cmd import reboot  # pytype: disable=import-error # pylint: disable=import-error
+from plumbum.cmd import sudo  # pytype: disable=import-error # pylint: disable=import-error
 from PyInquirer import prompt
 
 from pibackbone import __file__
@@ -149,39 +149,44 @@ class PiBackbone():
         """Parse out answer"""
         print(answer)
         services = []
+        project = ""
         if 'project' in answer:
             if answer['project'] == 'None':
                 logging.info("Nothing chosen, quitting.")
                 self.quit()
+            # TODO get services in project and add to list
+            project = answer['project']
             print(self.definitions['projects'][answer['project']])
         elif 'services' in answer:
             if not answer['services']:
                 logging.info("Nothing chosen, quitting.")
                 self.quit()
             for service in answer['services']:
-                print(self.definitions['services'][service])
+                services.append(service)
         else:
             logging.error('Invalid choices in answer: %s', answer)
             self.quit()
-        return services
+        return services, project
 
-    def install_requirements(self):
+    def install_requirements(self, services):
         """Install requirements of choices made"""
         # TODO install things to config.txt
         pass
 
     def apply_secrets(self):
         """Set secret information specific to the deployment"""
-        # TODO if s3, ask for aws creds, or look for env vars, ask for bucket name, ask for default region
-        # TODO if status-updater ask for webhook url
-        # TODO ask for device name
-        # TODO ask for location of deployment
+        # TODO if s3, ask for aws creds
+        # TODO for line in .env ask to apply a value
         pass
 
     def start_services(self):
         """Start services that were requested"""
         # TODO collect required compose files, and start with compose
         # TODO ask if you want watchtower to do automatic updates for you
+        pass
+
+    def output_notes(self):
+        """Output any notes if a project was chosen and has notes"""
         pass
 
     @staticmethod
@@ -194,24 +199,19 @@ class PiBackbone():
         parser = argparse.ArgumentParser(prog='PiBackbone',
                                          description='PiBackbone - A tool for installing the basic required subsystems on a Pi-based project')
         # TODO add option to self update pibackbone
-        # TODO set log level
-        parser.add_argument('--verbose', '-v', choices=[
-                            'DEBUG', 'INFO', 'WARNING', 'ERROR'],
-                            default='INFO',
-                            help='logging level (default=INFO)')
         parser.add_argument('--version', '-V', action='version',
                             version=f'%(prog)s {__version__}')
         args = parser.parse_args(self.raw_args)
-        # TODO do something with args
         self.set_config_dir()
         self.get_definitions()
-        services = self.parse_answer(self.menu())
-        # TODO install requirements
-        # TODO get secrets and apply them, AWS, webhooks, .env, etc.
-        # TODO start services
+        services, project = self.parse_answer(self.menu())
+        self.install_requirements(services)
+        self.apply_secrets()
+        self.start_services()
+        if project:
+            self.output_notes(project)
         self.reset_cwd()
 
-        # TODO ask to reboot, reboot if yes
         answer = self.execute_prompt(self.reboot_question())
         if 'reboot_machine' in answer and answer['reboot_machine']:
             self.restart()
