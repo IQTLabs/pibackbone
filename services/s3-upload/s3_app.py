@@ -57,20 +57,25 @@ def tar_dir(filedir, tarfile, xz=False):
     return False
 
 
-def job(hostname):
+def job(hostname, status):
     timestamp = int(time.time())
     if not os.path.exists(S3_DIR):
         os.mkdir(S3_DIR)
 
-    for telemetry, xz in TELEMETRY_TYPES:
-        filedir = os.path.join(TELEMETRY_DIR, telemetry)
-        if not os.path.exists(filedir):
-            os.mkdir(filedir)
-        tarfile = f'{S3_DIR}/{telemetry}-{hostname}-{timestamp}.tar'
-        if xz:
-            tarfile = tarfile + '.xz'
-        print(f'processing {filedir}, tar {tarfile}')
-        tar_dir(filedir, tarfile, xz=xz)
+    if status:
+        files = get_nondot_files(os.path.join(TELEMETRY_DIR, 'status'))
+        for file in files:
+            os.rename(file, os.path.join(S3_DIR, os.path.basename(file)))
+    else:
+        for telemetry, xz in TELEMETRY_TYPES:
+            filedir = os.path.join(TELEMETRY_DIR, telemetry)
+            if not os.path.exists(filedir):
+                os.mkdir(filedir)
+            tarfile = f'{S3_DIR}/{telemetry}-{hostname}-{timestamp}.tar'
+            if xz:
+                tarfile = tarfile + '.xz'
+            print(f'processing {filedir}, tar {tarfile}')
+            tar_dir(filedir, tarfile, xz=xz)
     s3_copy(S3_DIR)
     return
 
@@ -78,7 +83,8 @@ def job(hostname):
 def main():
     hostname = os.getenv("HOSTNAME", platform.node())
     # time is in UTC because it's a container
-    schedule.every().day.at("18:00").do(job, hostname)
+    schedule.every().day.at("18:00").do(job, hostname=hostname, status=False)
+    schedule.every().hour().do(job, hostname=hostname, status=True)
     while True:
         schedule.run_pending()
         time.sleep(60)
