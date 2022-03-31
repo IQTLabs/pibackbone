@@ -255,7 +255,7 @@ class Telemetry:
         payload = copy.deepcopy(self.sensor_data)
         payload['alerts'] = copy.deepcopy(self.alerts)
         with open(tmp_filename, 'w') as f:
-            json.dump(payload)
+            json.dump(payload, f)
         self.rename_dotfiles()
         print(f'Status update response: {status}')
 
