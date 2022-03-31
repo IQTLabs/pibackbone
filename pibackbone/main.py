@@ -9,10 +9,12 @@ import sys
 
 #import docker
 from examples import custom_style_2
-#from plumbum import FG  # pytype: disable=import-error
-#from plumbum import local  # pytype: disable=import-error
-#from plumbum import TF  # pytype: disable=import-error
-#from plumbum.cmd import docker_compose  # pytype: disable=import-error
+from plumbum import FG  # pytype: disable=import-error
+from plumbum import local  # pytype: disable=import-error
+from plumbum import TF  # pytype: disable=import-error
+from plumbum.cmd import docker_compose  # pytype: disable=import-error
+from plumbum.cmd import reboot  # pytype: disable=import-error
+from plumbum.cmd import sudo  # pytype: disable=import-error
 from PyInquirer import prompt
 
 from pibackbone import __file__
@@ -113,6 +115,7 @@ class PiBackbone():
         os.chdir(self.previous_dir)
 
     def get_definitions(self):
+        """Get definitions of services and projects"""
         with open('definitions.json', 'r') as f:
             self.definitions = json.load(f)
             self.services = self.definitions['services']
@@ -127,6 +130,17 @@ class PiBackbone():
         else:
             answer = self.execute_prompt(self.services_question())
         return answer
+
+    def reboot_question(self):
+        """Ask if they would like to reboot the machine"""
+        return [
+            {
+                'type': 'confirm',
+                'name': 'reboot_machine',
+                'message': 'Do you want to reboot this machine now? (Recommended as some changes require a reboot to take effect)',
+                'default': True,
+            },
+        ]
 
     def parse_answer(self, answer):
         """Parse out answer"""
@@ -150,7 +164,6 @@ class PiBackbone():
 
     def install_requirements(self):
         """Install requirements of choices made"""
-        # TODO check for crons to install
         # TODO install things to config.txt
         pass
 
@@ -168,9 +181,9 @@ class PiBackbone():
         # TODO ask if you want watchtower to do automatic updates for you
         pass
 
-    def reboot(self):
-        """Reboot the machine"""
-        pass
+    def restart(self):
+        """Restart the machine"""
+        sudo[reboot]()
 
     def main(self):
         """Main entrypoint to the class, parse args and main program driver"""
@@ -193,4 +206,8 @@ class PiBackbone():
         # TODO get secrets and apply them, AWS, webhooks, .env, etc.
         # TODO start services
         self.reset_cwd()
+
         # TODO ask to reboot, reboot if yes
+        answer = self.execute_prompt(self.reboot_question())
+        if 'reboot_machine' in answer and answer['reboot_machine']:
+            self.restart()

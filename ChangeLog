@@ -1,6 +1,19 @@
 CHANGES
 =======
 
+* prevent divide by zero
+* Update dependency pylint to v2.13.3
+* more status checks; set lux to low for value overflow
+* Update dependency awscli to v1.22.83
+* Update dependency pylint to v2.13.2
+* tweak gps check timing
+* Update dependency awscli to v1.22.82
+* add attribute
+* add more status checks
+* keep location tracking on longer to get a fix
+* stubbing and more structure
+* Update dependency pylint to v2.13.0
+* Update dependency awscli to v1.22.81
 * add back more status checks
 * Update dependency awscli to v1.22.80
 * fix project list

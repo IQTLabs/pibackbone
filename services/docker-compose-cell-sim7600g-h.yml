@@ -13,4 +13,4 @@ services:
       - "/sys:/sys"
     command:
       - fast.t-mobile.net
-      - "300"
+      - ${GPS_CHECK}
