@@ -84,7 +84,7 @@ def main():
     hostname = os.getenv("HOSTNAME", platform.node())
     # time is in UTC because it's a container
     schedule.every().day.at("18:00").do(job, hostname=hostname, status=False)
-    schedule.every().hour().do(job, hostname=hostname, status=True)
+    schedule.every().hour.do(job, hostname=hostname, status=True)
     while True:
         schedule.run_pending()
         time.sleep(60)
