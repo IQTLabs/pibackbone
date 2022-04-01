@@ -170,8 +170,13 @@ class PiBackbone():
 
     def install_requirements(self, services):
         """Install requirements of choices made"""
+        config = []
+        for service in services:
+            if 'config' in self.services[service]:
+                config = self.services[service]['config']
+        for entry in config:
+            print(entry)
         # TODO install things to config.txt
-        pass
 
     def apply_secrets(self):
         """Set secret information specific to the deployment"""
