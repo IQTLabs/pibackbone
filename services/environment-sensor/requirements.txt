@@ -1,4 +1,4 @@
-Pillow==9.0.1
+Pillow==9.1.0
 RPi.GPIO==0.7.1
 sensirion-gas-index-algorithm==3.1.0
 smbus2==0.4.1
