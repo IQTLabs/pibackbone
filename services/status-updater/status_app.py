@@ -1,4 +1,3 @@
-import copy
 import glob
 import json
 import os
@@ -13,6 +12,8 @@ from hooks import send_hook
 
 
 class Telemetry:
+
+    SHUTDOWN_PATH = '/var/run/shutdown.signal'
 
     def __init__(self, base_dir='/flash/telemetry'):
         # plus 0.5 second for status per wake and plus time to run loop
@@ -252,8 +253,8 @@ class Telemetry:
     def write_sensor_data(self, timestamp):
         status = self.status_hook()
         tmp_filename = f'{self.status_dir}/.status-{self.hostname}-{timestamp}.json'
-        payload = copy.deepcopy(self.sensor_data)
-        payload['alerts'] = json.loads(json.dumps(self.alerts))
+        payload = self.sensor_data
+        payload['alerts'] = self.alerts
         with open(tmp_filename, 'w') as f:
             json.dump(payload, f)
         self.rename_dotfiles()
@@ -423,11 +424,10 @@ class Telemetry:
 
             # Check if a shutdown has been signaled
             signal_contents = ""
-            try:
+
+            if os.path.exists(self.SHUTDOWN_PATH) and os.access(self.SHUTDOWN_PATH, os.R_OK):
                 with open('/var/run/shutdown.signal', 'r') as f:
-                    signal_contents = f.read()
-            except Exception as e:
-                pass
+                     signal_contents = f.read()
 
             if signal_contents.strip() == 'true':
                 self.shutdown_hook("Low battery")
