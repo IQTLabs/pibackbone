@@ -2,6 +2,7 @@
 
 import os
 import platform
+import shutil
 import subprocess
 import time
 from pathlib import Path
@@ -65,7 +66,7 @@ def job(hostname, status):
     if status:
         files = get_nondot_files(os.path.join(TELEMETRY_DIR, 'status'))
         for file in files:
-            os.rename(file, os.path.join(S3_DIR, os.path.basename(file)))
+            shutil.move(file, os.path.join(S3_DIR, os.path.basename(file)))
     else:
         for telemetry, xz in TELEMETRY_TYPES:
             filedir = os.path.join(TELEMETRY_DIR, telemetry)
