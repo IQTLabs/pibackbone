@@ -9,5 +9,6 @@ services:
       - "HOSTNAME=${HOSTNAME}"
     volumes:
       - "/flash/telemetry/sensors:/flash/telemetry/sensors"
+      - "/flash/telemetry/status:/flash/telemetry/status"
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
