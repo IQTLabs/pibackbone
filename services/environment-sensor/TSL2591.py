@@ -148,10 +148,13 @@ class TSL2591:
         full, ir = self.Read_2Channel()
         if full == 0xFFFF or ir == 0xFFFF:
             raise RuntimeError('Numerical overflow!')
+        if full == 0x0000:
+            full = 0x0001
 
         # lux1 = (full - (LUX_COEFB * ir)) / self.Cpl
         # lux2 = ((LUX_COEFC * full) - (LUX_COEFD * ir)) / self.Cpl
         # return max(int(lux1), int(lux2))
+         
         lux = ((full-ir) * (1.00 - (ir/full))) / self.Cpl
         # lux = (full-ir)/ self.Cpl
         return lux
