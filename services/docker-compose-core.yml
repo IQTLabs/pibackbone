@@ -31,7 +31,7 @@ services:
       - "LOCATION=${LOCATION}"
       - "WEBHOOK_URL=${WEBHOOK_URL}"
     volumes:
-      - "/flash:/flash:ro"
+      - "/flash:/flash"
       - "/var/run/docker.sock:/var/run/docker.sock"
   watchtower:
     image: containrrr/watchtower:latest
