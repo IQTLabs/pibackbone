@@ -410,6 +410,7 @@ class Telemetry:
         self.sensor_data["uptime_seconds"].append([time.clock_gettime(time.CLOCK_BOOTTIME), timestamp])
 
     def main(self, run_forever):
+        os.makedirs(self.status_dir, exist_ok=True)
         self.init_sensor_data()
 
         # Cycle through getting readings forever
