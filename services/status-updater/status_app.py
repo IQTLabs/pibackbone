@@ -241,7 +241,6 @@ class Telemetry:
                             "internet": [],
                             "disk_free_gb": [],
                             "uptime_seconds": [],
-                            "version_sense": [],
                            }
 
     def rename_dotfiles(self):
