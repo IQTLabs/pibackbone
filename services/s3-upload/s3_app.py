@@ -66,7 +66,8 @@ def job(hostname, status):
     if status:
         files = get_nondot_files(os.path.join(TELEMETRY_DIR, 'status'))
         for file in files:
-            shutil.move(file, os.path.join(S3_DIR, os.path.basename(file)))
+            shutil.copy(file, os.path.join(S3_DIR, os.path.basename(file)))
+            os.remove(file)
     else:
         for telemetry, xz in TELEMETRY_TYPES:
             filedir = os.path.join(TELEMETRY_DIR, telemetry)
