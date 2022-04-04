@@ -254,6 +254,8 @@ class Telemetry:
         status = self.status_hook()
         tmp_filename = f'{self.status_dir}/.status-{self.hostname}-{timestamp}.json'
         payload = self.sensor_data
+        for key in payload.keys():
+            paylaod[key] = payload[key][-1]
         payload['alerts'] = self.alerts
         with open(tmp_filename, 'w') as f:
             json.dump(payload, f)
