@@ -16,7 +16,7 @@ uname -m > /dev/null # TODO check for arm, and version
 # update pip
 python3 -m pip install --upgrade pip
 
-docker version > /dev/null || (echo "Installing Docker..." && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker "$(whoami)")
+docker version > /dev/null || (echo "Installing Docker..." && curl -fsSL https://get.docker.com | sudo sh - && sudo usermod -aG docker "$(whoami)")
 
 # pull down pibackbone repo and install
 cd /opt
@@ -48,6 +48,3 @@ sudo cp config.txt /boot/config.txt
 sudo raspi-config nonint do_i2c 0
 
 cd "$cwd"
-
-# run pibackbone
-pibackbone
