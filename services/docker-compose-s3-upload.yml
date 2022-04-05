@@ -1,0 +1,12 @@
+version: "3"
+services:
+  s3-upload:
+    image: iqtlabs/pibackbone-s3-upload:stable
+    restart: always
+    environment:
+      - "HOSTNAME=${HOSTNAME}"
+      - "S3_BUCKET=${S3_BUCKET}"
+    volumes:
+      - "/flash/telemetry:/flash/telemetry"
+      - "/flash/s3:/flash/s3"
+      - $HOME/.aws:/root/.aws:ro

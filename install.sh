@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 cwd=$PWD
 
@@ -13,14 +14,14 @@ git --version > /dev/null || echo "First install git then try again."
 uname -m > /dev/null # TODO check for arm, and version
 
 # install docker if it's not already
-docker version || echo "Installing Docker..." && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker "$(whoami)"
+docker version > /dev/null || echo "Installing Docker..." && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker "$(whoami)"
 
 # pull down pibackbone repo and install
 cd /opt
 git clone https://github.com/iqtlabs/pibackbone 
 cd pibackbone
 pip3 install .
-sudo cp scripts/cron.d/* /etc/cron.d/
+sudo cp scripts/cron.d/pibackbone /etc/cron.d/pibackbone
 
 # disable unneeded services
 sudo systemctl stop avahi-daemon.service
@@ -32,13 +33,12 @@ sudo systemctl disable avahi-daemon.socket
 sudo systemctl disable apt-daily-upgrade.service
 sudo systemctl disable apt-daily-upgrade.timer
 
-# TODO change swap size to 8GB
-# sudo dphys-swapfile swapoff
-# sudo vi /etc/dphys-swapfile
-# CONF_SWAPSIZE=8192
-# sudo dphys-swapfile setup
-# sudo dphys-swapfile swapon
+# change swap size to 8GB
 # requires a reboot to take effect
+sudo dphys-swapfile swapoff
+sudo sed -i '/CONF_SWAPSIZE/c\CONF_SWAPSIZE=8192' /etc/dphys-swapfile
+sudo dphys-swapfile setup
+sudo dphys-swapfile swapon
 
 # set raspi-config options
 sudo cp config.txt /boot/config.txt

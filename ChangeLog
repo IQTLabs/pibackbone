@@ -1,6 +1,29 @@
 CHANGES
 =======
 
+* fix full path for files
+* explicit copy and delete
+* use move instead because of docker volume
+* Update dependency awscli to v1.22.88
+* remove unused key
+* typo
+* only keep the last update for status
+* changed the wrong service's volume
+* fix volume access
+* fix a few bugs
+* Update dependency awscli to v1.22.87
+* get config items to install
+* typo
+* Update dependency Pillow to v9.1.0
+* merge
+* workaround for pytype
+* forgot file handler
+* deep copy dicts
+* Update dependency awscli to v1.22.86
+* specify arg names
+* upload status data once an hour to s3
+* fix args
+* cleanup and scaffold
 * linting
 * small improvements
 * Update dependency pylint to v2.13.4

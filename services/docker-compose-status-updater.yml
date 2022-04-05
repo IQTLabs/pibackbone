@@ -1,0 +1,12 @@
+version: "3"
+services:
+  status-updater:
+    image: iqtlabs/pibackbone-status-updater:stable
+    restart: always
+    environment:
+      - "HOSTNAME=${HOSTNAME}"
+      - "LOCATION=${LOCATION}"
+      - "WEBHOOK_URL=${WEBHOOK_URL}"
+    volumes:
+      - "/flash:/flash"
+      - "/var/run/docker.sock:/var/run/docker.sock"
