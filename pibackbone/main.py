@@ -199,8 +199,11 @@ class PiBackbone():
         for entry in config:
             chain = echo[entry] | sudo[tee["-a", "/boot/config.txt"]]
             chain()
+        current_dir = os.getcwd() 
+        os.chdir('/tmp')
         for entry in install:
             os.system(entry)
+        os.chdir(current_dir)
 
     def apply_secrets(self):
         """Set secret information specific to the deployment"""
