@@ -12,9 +12,12 @@ from examples import custom_style_2
 from plumbum import FG  # pytype: disable=import-error
 from plumbum import local  # pytype: disable=import-error
 from plumbum import TF  # pytype: disable=import-error
+from plumbum.cmd import cp  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import docker_compose  # pytype: disable=import-error # pylint: disable=import-error
+from plumbum.cmd import echo  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import reboot  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import sudo  # pytype: disable=import-error # pylint: disable=import-error
+from plumbum.cmd import tee  # pytype: disable=import-error # pylint: disable=import-error
 from PyInquirer import prompt
 
 from pibackbone import __file__
@@ -24,7 +27,23 @@ from pibackbone import __version__
 level_int = {'CRITICAL': 50, 'ERROR': 40, 'WARNING': 30, 'INFO': 20,
              'DEBUG': 10}
 level = level_int.get(os.getenv('LOGLEVEL', 'INFO').upper(), 0)
-logging.basicConfig(level=level)
+format = '%(message)s'
+logging.basicConfig(format=format, level=level)
+
+
+class bcolors:
+    """
+    Colors from: https://svn.blender.org/svnroot/bf-blender/trunk/blender/build_files/scons/tools/bcolors.py
+    """
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 
 class PiBackbone():
@@ -109,7 +128,7 @@ class PiBackbone():
             os.chdir(realpath)
         except Exception as err:  # pragma: no cover
             logging.error(
-                'Unable to find config files, exiting because: %s', err)
+                '%sUnable to find config files, exiting because: %s%s', bcolors.FAIL, err, bcolors.ENDC)
             self.quit()
 
     def reset_cwd(self):
@@ -147,36 +166,41 @@ class PiBackbone():
 
     def parse_answer(self, answer):
         """Parse out answer"""
-        print(answer)
         services = []
         project = ""
         if 'project' in answer:
             if answer['project'] == 'None':
-                logging.info("Nothing chosen, quitting.")
+                logging.info('%sNothing chosen, quitting.%s', bcolors.OKCYAN, bcolors.ENDC)
                 self.quit()
-            # TODO get services in project and add to list
             project = answer['project']
-            print(self.definitions['projects'][answer['project']])
+            services = self.definitions['projects'][project]['services']
         elif 'services' in answer:
             if not answer['services']:
-                logging.info("Nothing chosen, quitting.")
+                logging.info('%sNothing chosen, quitting.%s', bcolors.OKCYAN, bcolors.ENDC)
                 self.quit()
             for service in answer['services']:
                 services.append(service)
         else:
-            logging.error('Invalid choices in answer: %s', answer)
+            logging.error('%sInvalid choices in answer: %s%s', bcolors.FAIL, answer, bcolors.ENDC)
             self.quit()
         return services, project
 
     def install_requirements(self, services):
         """Install requirements of choices made"""
         config = []
+        install = []
         for service in services:
             if 'config' in self.services[service]:
-                config = self.services[service]['config']
+                config += self.services[service]['config']
+            if 'install' in self.services[service]: 
+                install += self.services[service]['install']
+            if os.path.exists(f'scripts/{service}'):
+                sudo[cp[f'scripts/{service}', f'/etc/cron.d/{service}']]
         for entry in config:
-            print(entry)
-        # TODO install things to config.txt
+            chain = echo[entry] | sudo[tee["-a", "/boot/config.txt"]]
+            chain()
+        for entry in install:
+            os.system(entry)
 
     def apply_secrets(self):
         """Set secret information specific to the deployment"""
@@ -187,16 +211,17 @@ class PiBackbone():
     def start_services(self):
         """Start services that were requested"""
         # TODO collect required compose files, and start with compose
-        # TODO ask if you want watchtower to do automatic updates for you
+        # TODO ask if you want core services including watchtower to do automatic updates for you
         pass
 
     def output_notes(self, project):
         """Output any notes if a project was chosen and has notes"""
-        pass
+        logging.info('%s%s%s', bcolors.HEADER, self.definitions["projects"][project]["notes"], bcolors.ENDC)
 
     @staticmethod
     def restart():
         """Restart the machine"""
+        logging.warning('%sRebooting now!%s', bcolors.WARNING, bcolors.ENDC)
         sudo[reboot]()
 
     def main(self):

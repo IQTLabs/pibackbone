@@ -7,6 +7,11 @@
       "config": [
         "enable_uart=1",
         "dtoverlay=disable-bt"
+      ],
+      "install": [
+        "wget https://github.com/itemir/rpi_boat_utils/raw/master/uart_control/uart_control",
+        "chmod +x ./uart_control",
+        "sudo ./uart_control gpio"
       ]
     },
     "environment-sensor": {
@@ -20,7 +25,11 @@
     "pijuice": {
       "config": [
         "dtoverlay=i2c-rtc,ds1339=1,addr=0x69"
-      ]
+      ],
+      "install": [
+        "git clone https://github.com/PiSupply/PiJuice.git",
+        "sudo dpkg -i PiJuice/Software/Install/pijuice-base_1.8_all.deb"
+      ],
     },
     "s3-upload": {
       "config": []
