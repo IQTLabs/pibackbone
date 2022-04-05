@@ -18,7 +18,7 @@ docker version > /dev/null || echo "Installing Docker..." && curl -fsSL https://
 
 # pull down pibackbone repo and install
 cd /opt
-git clone https://github.com/iqtlabs/pibackbone 
+sudo git clone https://github.com/iqtlabs/pibackbone 
 cd pibackbone
 pip3 install .
 sudo cp scripts/cron.d/pibackbone /etc/cron.d/pibackbone
