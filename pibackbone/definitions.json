@@ -29,7 +29,7 @@
       "install": [
         "git clone https://github.com/PiSupply/PiJuice.git",
         "sudo dpkg -i PiJuice/Software/Install/pijuice-base_1.8_all.deb"
-      ],
+      ]
     },
     "s3-upload": {
       "config": []
