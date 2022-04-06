@@ -275,6 +275,7 @@ class PiBackbone():
                 sudo[chmod['600', os.path.join(aws_dir, 'config')]]()
 
         envs = []
+        sudo[chmod['666', 'services/.env']]()
         with open('services/.env', 'r') as f:
             for line in f:
                 envs.append(line.strip().split('='))
