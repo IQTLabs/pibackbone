@@ -296,7 +296,7 @@ class PiBackbone():
         for service in services:
             compose_files += ['-f', f'docker-compose-{service}.yml']
         compose_files += ['up', '-d']
-        with local.cwd(local.cwd // 'services'):
+        with local.cwd(local.cwd / 'services'):
             docker_compose.bound_command(compose_files) & FG
 
     def output_notes(self, project):
