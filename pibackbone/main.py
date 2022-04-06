@@ -297,7 +297,7 @@ class PiBackbone():
             compose_files += ['-f', f'docker-compose-{service}.yml']
         compose_files += ['up', '-d']
         with local.cwd(local.cwd / 'services'):
-            docker_compose.bound_command(compose_files) & FG
+            sudo[docker_compose.bound_command(compose_files)] & FG
 
     def output_notes(self, project):
         """Output any notes if a project was chosen and has notes"""
