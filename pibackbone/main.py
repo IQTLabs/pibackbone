@@ -12,6 +12,8 @@ from examples import custom_style_2
 from plumbum import FG  # pytype: disable=import-error
 from plumbum import local  # pytype: disable=import-error
 from plumbum import TF  # pytype: disable=import-error
+from plumbum.cmd import chmod  # pytype: disable=import-error # pylint: disable=import-error
+from plumbum.cmd import chown  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import cp  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import docker_compose  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import echo  # pytype: disable=import-error # pylint: disable=import-error
@@ -154,6 +156,47 @@ class PiBackbone():
         return answer
 
     @staticmethod
+    def aws_questions():
+        """Ask for AWS credentials"""
+        return [
+            {
+                'type': 'password',
+                'message': 'Enter your AWS Access Key ID',
+                'name': 'aws_access_key_id'
+            },
+            {
+                'type': 'password',
+                'message': 'Enter your AWS Secret Access Key',
+                'name': 'aws_secret_access_key'
+            },
+        ]
+
+    @staticmethod
+    def env_questions(envs):
+        """Ask for environment variable values"""
+        questions = []
+        for env in envs:
+            question = {}
+            question['type'] = 'input'
+            question['name'] = env[0]
+            question['message'] = f'Would you like to set the environment variable for: {env[0]}?'
+            question['default'] = env[1]
+            questions.append(question)
+        return questions
+
+    @staticmethod
+    def core_services_question():
+        """Ask if running core services"""
+        return [
+            {
+                'type': 'confirm',
+                'name': 'core_services',
+                'message': 'Do you want to run a core services (watchtower, etc.) alongside your choices?',
+                'default': True,
+            },
+        ]
+
+    @staticmethod
     def reboot_question():
         """Ask if they would like to reboot the machine"""
         return [
@@ -206,17 +249,54 @@ class PiBackbone():
             os.system(entry)
         os.chdir(current_dir)
 
-    def apply_secrets(self):
+    def apply_secrets(self, services):
         """Set secret information specific to the deployment"""
-        # TODO if s3, ask for aws creds
-        # TODO for line in .env ask to apply a value
-        pass
+        if 's3-upload' in services:
+            aws_dir = os.path.join(os.path.expanduser("~"), '.aws')
+            if not os.path.exists(os.path.join(aws_dir, 'credentials')):
+                answer = self.execute_prompt(self.aws_questions())
+                aws_id = ""
+                aws_secret = ""
+                if 'aws_access_key_id' in answer:
+                    aws_id = answer['aws_access_key_id']
+                if 'aws_secret_access_key' in answer:
+                    aws_secret = answer['aws_secret_access_key']
+                os.makedirs(aws_dir, exist_ok=True)
+                with open(os.path.join(aws_dir, 'credentials'), 'w') as f: 
+                    f.write(f'[default]\naws_access_key_id = {aws_id}\naws_secret_access_key = {aws_secret}') 
+                aws_id = ""
+                aws_secret = ""
+                answer = None
+                with open(os.path.join(aws_dir, 'config'), 'w') as f:
+                    f.write("[default]\nregion = us-east-1\noutput = json")
+                sudo[chown['-R', 'root:root', aws_dir]]()
+                sudo[chmod['750', aws_dir]]()
+                sudo[chmod['600', os.path.join(aws_dir, 'credentials')]]()
+                sudo[chmod['600', os.path.join(aws_dir, 'config')]]()
 
-    def start_services(self):
+        envs = []
+        with open('services/.env', 'r') as f:
+            for line in f:
+                envs.append(line.strip().split('='))
+        answer = self.execute_prompt(self.env_questions(envs))
+        with open('services/.env', 'w') as f:
+            for env in envs:
+                if env[0] in answer:
+                    f.write(f'{env[0]}={answer[env[0]]}\n')
+                else:
+                    f.write(f'{env[0]}={env[1]}\n')
+
+    def start_services(self, services):
         """Start services that were requested"""
-        # TODO collect required compose files, and start with compose
-        # TODO ask if you want core services including watchtower to do automatic updates for you
-        pass
+        compose_files = []
+        answer = self.execute_prompt(self.core_services_question())
+        if 'core_services' in answer and answer['core_services']:
+            compose_files += ['-f', 'docker-compose-core.yml']
+        for service in services:
+            compose_files += ['-f', f'docker-compose-{service}.yml']
+        compose_files += ['up', '-d']
+        with local.cwd(local.cwd // 'services'):
+            docker_compose.bound_command(compose_files) & FG
 
     def output_notes(self, project):
         """Output any notes if a project was chosen and has notes"""
@@ -247,8 +327,8 @@ class PiBackbone():
         self.get_definitions()
         services, project = self.parse_answer(self.menu())
         self.install_requirements(services)
-        self.apply_secrets()
-        self.start_services()
+        self.apply_secrets(services)
+        self.start_services(services)
         if project:
             self.output_notes(project)
         self.reset_cwd()
