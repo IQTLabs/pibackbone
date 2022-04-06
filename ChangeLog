@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* add option to shutdown instead of reboot
 * workaround for piping
 * change directory temporarily for install
 * cleanup
