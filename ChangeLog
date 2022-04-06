@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+* workaround for piping
+* change directory temporarily for install
+* cleanup
+* Update dependency awscli to v1.22.89
+* missing parens for logic
+* needs sudo
+* progress on installation scripts
+* Update codecov/codecov-action action to v3
 * fix full path for files
 * explicit copy and delete
 * use move instead because of docker volume

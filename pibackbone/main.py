@@ -16,6 +16,7 @@ from plumbum.cmd import cp  # pytype: disable=import-error # pylint: disable=imp
 from plumbum.cmd import docker_compose  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import echo  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import reboot  # pytype: disable=import-error # pylint: disable=import-error
+from plumbum.cmd import shutdown  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import sudo  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import tee  # pytype: disable=import-error # pylint: disable=import-error
 from PyInquirer import prompt
@@ -157,10 +158,10 @@ class PiBackbone():
         """Ask if they would like to reboot the machine"""
         return [
             {
-                'type': 'confirm',
+                'type': 'list',
                 'name': 'reboot_machine',
-                'message': 'Do you want to reboot this machine now? (Recommended as some changes require a reboot to take effect)',
-                'default': True,
+                'message': 'Do you want to reboot or shutdown this machine now? (Recommended as some changes require a reboot to take effect)',
+                'choices': ['Reboot', 'Shutdown', 'None'],
             },
         ]
 
@@ -227,6 +228,13 @@ class PiBackbone():
         logging.warning('%sRebooting now!%s', bcolors.WARNING, bcolors.ENDC)
         sudo[reboot]()
 
+    @staticmethod
+    def shutdown():
+        """Shutdown the machine"""
+        logging.warning('%sShutting down now!%s', bcolors.WARNING, bcolors.ENDC)
+        sudo[shutdown['-h', 'now']]()
+
+
     def main(self):
         """Main entrypoint to the class, parse args and main program driver"""
         parser = argparse.ArgumentParser(prog='PiBackbone',
@@ -246,5 +254,8 @@ class PiBackbone():
         self.reset_cwd()
 
         answer = self.execute_prompt(self.reboot_question())
-        if 'reboot_machine' in answer and answer['reboot_machine']:
-            self.restart()
+        if 'reboot_machine' in answer:
+            if answer['reboot_machine'] == 'Reboot':
+                self.restart()
+            elif answer['reboot_machine'] == 'Shutdown':
+                self.shutdown()
