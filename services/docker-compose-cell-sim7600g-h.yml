@@ -12,5 +12,5 @@ services:
       - "/etc/resolv.conf:/etc/resolv.conf"
       - "/sys:/sys"
     command:
-      - fast.t-mobile.net
+      - ${APN}
       - ${GPS_CHECK}
