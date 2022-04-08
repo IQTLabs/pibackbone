@@ -48,3 +48,4 @@ sudo cp config.txt /boot/config.txt
 sudo raspi-config nonint do_i2c 0
 
 cd "$cwd"
+echo -e "\n\n\n======\n\nFinished installing.\nRun 'pibackbone' to continue with setting up services or a project.\n\n======\n"
