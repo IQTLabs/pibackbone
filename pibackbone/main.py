@@ -218,6 +218,9 @@ class PiBackbone():
                 self.quit()
             project = answer['project']
             services = self.definitions['projects'][project]['services']
+            logging.info('The project %s%s%s uses the following services:\n', bcolors.OKGREEN, project, bcolors.ENDC) 
+            for service in services:
+                logging.info('%s%s%s', bcolors.OKGREEN, service, bcolors.ENDC)
         elif 'services' in answer:
             if not answer['services']:
                 logging.info('%sNothing chosen, quitting.%s', bcolors.OKCYAN, bcolors.ENDC)
@@ -233,6 +236,7 @@ class PiBackbone():
         """Install requirements of choices made"""
         config = []
         install = []
+        logging.info('%sInstalling requirements for services into /etc/cron.d/ and /boot/config.txt...%s', bcolors.OKCYAN, bcolors.ENDC)
         for service in services:
             if 'config' in self.services[service]:
                 config += self.services[service]['config']
@@ -251,6 +255,7 @@ class PiBackbone():
 
     def apply_secrets(self, services):
         """Set secret information specific to the deployment"""
+        logging.info('%sApplying secrets and system specific variables...%s', bcolors.OKCYAN, bcolors.ENDC)
         if 's3-upload' in services:
             aws_dir = os.path.join(os.path.expanduser("~"), '.aws')
             if not os.path.exists(os.path.join(aws_dir, 'credentials')):
@@ -296,6 +301,7 @@ class PiBackbone():
         for service in services:
             compose_files += ['-f', f'docker-compose-{service}.yml']
         compose_files += ['up', '-d']
+        logging.info('%sStarting services...%s', bcolors.OKCYAN, bcolors.ENDC)
         with local.cwd(local.cwd / 'services'):
             sudo[docker_compose.bound_command(compose_files)] & FG
 

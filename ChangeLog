@@ -1,6 +1,15 @@
 CHANGES
 =======
 
+* make apn configurable
+* Update dependency awscli to v1.22.91
+* Update dependency pytype to v2022.4.6
+* Update dependency pylint to v2.13.5
+* Update dependency awscli to v1.22.90
+* start with sudo
+* extra /
+* fix permissions
+* add secrets and container start functionality
 * add option to shutdown instead of reboot
 * workaround for piping
 * change directory temporarily for install
