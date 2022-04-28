@@ -67,9 +67,9 @@ class Telemetry:
                     self.sensor_data[container.name.split('_')[1]] = [[str(e), timestamp]]
                 healthy = False
         if 'unhealthy_containers' in self.sensor_data:
-            self.sensor_data['unhealthy_containers'].append([unhealthy_containers, timestamp])
+            self.sensor_data['unhealthy_containers'].append([" ".join(unhealthy_containers), timestamp])
         else:
-            self.sensor_data['unhealthy_containers'] = [[unhealthy_containers, timestamp]]
+            self.sensor_data['unhealthy_containers'] = [[" ".join(unhealthy_containers), timestamp]]
         return healthy
 
     @staticmethod
@@ -289,7 +289,7 @@ class Telemetry:
         data['body_subtitle'] = f'{health} / {checks} checks healthy'
         if health < checks:
             data['themeColor'] = "d95f02"
-        data['text'] = f'Checks that alerted: {unhealthy}'
+        data['text'] = f'Checks that alerted: {" ".join(unhealthy)}'
         data['facts'] = self.status_data()
         card = insert_message_data(data)
         status = send_hook(card)

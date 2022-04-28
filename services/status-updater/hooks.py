@@ -1,4 +1,5 @@
 import os
+import time
 
 import httpx
 
@@ -7,10 +8,11 @@ def get_url():
     return os.getenv("WEBHOOK_URL", "")
 
 def message_card_template():
+    timestamp = int(time.time())
     card = {
         "@type": "MessageCard",
         "@context": "https://schema.org/extensions",
-        "summary": "Status Updates",
+        "summary": f"Status Update - {timestamp}",
         "themeColor": "1b9e77",
         "title": "",
         "sections": [
