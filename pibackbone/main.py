@@ -303,7 +303,10 @@ class PiBackbone():
         compose_files += ['up', '-d']
         logging.info('%sStarting services...%s', bcolors.OKCYAN, bcolors.ENDC)
         with local.cwd(local.cwd / 'services'):
-            sudo[docker_compose.bound_command(compose_files)] & FG
+            try:
+                sudo[docker_compose.bound_command(compose_files)] & FG
+            except Exception as e:
+                print(f'Failed to start services (though this is likely due to the system needing a reboot before they will work): {e}')
 
     def output_notes(self, project):
         """Output any notes if a project was chosen and has notes"""
