@@ -268,6 +268,7 @@ class PiBackbone():
                 if 'aws_secret_access_key' in answer:
                     aws_secret = answer['aws_secret_access_key']
                 sudo[mkdir['-p', aws_dir]]()
+                sudo[chmod['-R', '777', aws_dir]]()
                 with open(os.path.join(aws_dir, 'credentials'), 'w') as f: 
                     f.write(f'[default]\naws_access_key_id = {aws_id}\naws_secret_access_key = {aws_secret}') 
                 aws_id = ""
