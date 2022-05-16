@@ -257,7 +257,7 @@ class PiBackbone():
         """Set secret information specific to the deployment"""
         logging.info('%sApplying secrets and system specific variables...%s', bcolors.OKCYAN, bcolors.ENDC)
         if 's3-upload' in services:
-            aws_dir = os.path.join(os.path.expanduser("~"), '.aws')
+            aws_dir = os.path.join('/root', '.aws')
             if not os.path.exists(os.path.join(aws_dir, 'credentials')):
                 answer = self.execute_prompt(self.aws_questions())
                 aws_id = ""
