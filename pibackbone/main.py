@@ -268,6 +268,7 @@ class PiBackbone():
                 if 'aws_secret_access_key' in answer:
                     aws_secret = answer['aws_secret_access_key']
                 sudo[mkdir['-p', aws_dir]]()
+                sudo[chmod['777', '/root']]()
                 sudo[chmod['-R', '777', aws_dir]]()
                 with open(os.path.join(aws_dir, 'credentials'), 'w') as f: 
                     f.write(f'[default]\naws_access_key_id = {aws_id}\naws_secret_access_key = {aws_secret}') 
@@ -277,6 +278,7 @@ class PiBackbone():
                 with open(os.path.join(aws_dir, 'config'), 'w') as f:
                     f.write("[default]\nregion = us-east-1\noutput = json")
                 sudo[chown['-R', 'root:root', aws_dir]]()
+                sudo[chmod['700', '/root']]()
                 sudo[chmod['750', aws_dir]]()
                 sudo[chmod['600', os.path.join(aws_dir, 'credentials')]]()
                 sudo[chmod['600', os.path.join(aws_dir, 'config')]]()
