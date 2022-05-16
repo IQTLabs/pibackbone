@@ -17,6 +17,7 @@ from plumbum.cmd import chown  # pytype: disable=import-error # pylint: disable=
 from plumbum.cmd import cp  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import docker_compose  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import echo  # pytype: disable=import-error # pylint: disable=import-error
+from plumbum.cmd import mkdir  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import reboot  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import shutdown  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import sudo  # pytype: disable=import-error # pylint: disable=import-error
@@ -266,7 +267,7 @@ class PiBackbone():
                     aws_id = answer['aws_access_key_id']
                 if 'aws_secret_access_key' in answer:
                     aws_secret = answer['aws_secret_access_key']
-                os.makedirs(aws_dir, exist_ok=True)
+                sudo[mkdir['-p', aws_dir]]()
                 with open(os.path.join(aws_dir, 'credentials'), 'w') as f: 
                     f.write(f'[default]\naws_access_key_id = {aws_id}\naws_secret_access_key = {aws_secret}') 
                 aws_id = ""
