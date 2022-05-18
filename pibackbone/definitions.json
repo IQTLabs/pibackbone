@@ -11,7 +11,8 @@
       "install": [
         "wget https://github.com/itemir/rpi_boat_utils/raw/master/uart_control/uart_control",
         "chmod +x ./uart_control",
-        "sudo ./uart_control gpio"
+        "sudo ./uart_control gpio",
+        "sudo ln -s /dev/zero /dev/serial0"
       ]
     },
     "environment-sensor": {
