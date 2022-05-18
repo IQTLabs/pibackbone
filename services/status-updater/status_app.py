@@ -103,10 +103,12 @@ class Telemetry:
 
     def check_ais(self):
         # check for new files, in the newest file, check if the number of lines has increased
-        files = sorted([f for f in os.listdir(self.ais_dir) if os.path.isfile(os.path.join(self.ais_dir, f))])
-
-        # check for dotfiles
-        files = self.reorder_dots(files)
+        try:
+            files = sorted([f for f in os.listdir(self.ais_dir) if os.path.isfile(os.path.join(self.ais_dir, f))])
+            # check for dotfiles
+            files = self.reorder_dots(files)
+        except FileNotFoundError:
+            files = None
 
         if not files:
             self.ais_file = None
@@ -124,10 +126,12 @@ class Telemetry:
         return False
 
     def check_gps(self, timestamp):
-        files = sorted([f for f in os.listdir(self.gps_dir) if os.path.isfile(os.path.join(self.gps_dir, f))])
-
-        # check for dotfiles
-        files = self.reorder_dots(files)
+        try:
+            files = sorted([f for f in os.listdir(self.gps_dir) if os.path.isfile(os.path.join(self.gps_dir, f))])
+            # check for dotfiles
+            files = self.reorder_dots(files)
+        except FileNotFoundError:
+            files = None
 
         if not files:
             self.gps_file = None
@@ -168,10 +172,12 @@ class Telemetry:
                         self.sensor_data['gps_sats'] = [[line.split('Satellites used:')[-1].strip(), timestamp]]
 
     def check_sensor(self):
-        files = sorted([f for f in os.listdir(self.sensor_dir) if os.path.isfile(os.path.join(self.sensor_dir, f))])
-
-        # check for dotfiles
-        files = self.reorder_dots(files)
+        try:
+            files = sorted([f for f in os.listdir(self.sensor_dir) if os.path.isfile(os.path.join(self.sensor_dir, f))])
+            # check for dotfiles
+            files = self.reorder_dots(files)
+        except FileNotFoundError:
+            files = None
 
         if not files:
             self.sensor_file = None
@@ -187,10 +193,12 @@ class Telemetry:
                     self.sensor_data[record['target']] = [record['datapoints'][-1]]
 
     def check_power(self):
-        files = sorted([f for f in os.listdir(self.power_dir) if os.path.isfile(os.path.join(self.power_dir, f))])
-
-        # check for dotfiles
-        files = self.reorder_dots(files)
+        try:
+            files = sorted([f for f in os.listdir(self.power_dir) if os.path.isfile(os.path.join(self.power_dir, f))])
+            # check for dotfiles
+            files = self.reorder_dots(files)
+        except FileNotFoundError:
+            files = None
 
         if not files:
             self.power_file = None
@@ -206,10 +214,12 @@ class Telemetry:
                     self.sensor_data[record['target']] = [record['datapoints'][-1]]
 
     def check_hydrophone(self):
-        files = sorted([f for f in os.listdir(self.hydrophone_dir) if os.path.isfile(os.path.join(self.hydrophone_dir, f))])
-
-        # check for dotfiles
-        files = self.reorder_dots(files)
+        try:
+            files = sorted([f for f in os.listdir(self.hydrophone_dir) if os.path.isfile(os.path.join(self.hydrophone_dir, f))])
+            # check for dotfiles
+            files = self.reorder_dots(files)
+        except FileNotFoundError:
+            files = None
 
         # no files
         if not files:
@@ -229,7 +239,11 @@ class Telemetry:
         return False
 
     def check_s3(self):
-        files = sorted([f for f in os.listdir(self.s3_dir) if os.path.isfile(os.path.join(self.s3_dir, f))])
+        try:
+            files = sorted([f for f in os.listdir(self.s3_dir) if os.path.isfile(os.path.join(self.s3_dir, f))])
+        except FileNotFoundError:
+            files = None
+
         if not files:
             return False, 0
         else:
