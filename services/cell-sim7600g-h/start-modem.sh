@@ -26,6 +26,7 @@ echo 'Y' | tee /sys/class/net/wwan0/qmi/raw_ip
 ip link set wwan0 up
 qmicli --device=/dev/cdc-wdm0 -p --wds-start-network="ip-type=4,apn=$APN" --client-no-release-cid
 udhcpc -i wwan0
+ip link set dev wwan0 mtu 900
 
 if [ $GPS -eq 0 ]; then
     echo "Sleeping..."

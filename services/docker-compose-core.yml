@@ -3,7 +3,8 @@ services:
   watchtower:
     image: containrrr/watchtower:latest
     restart: always
-    network_mode: host
+    networks:
+      - pibackbone
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
@@ -12,3 +13,8 @@ services:
       - "WATCHTOWER_INCLUDE_RESTARTING=true"
       - "WATCHTOWER_INCLUDE_STOPPED=true"
       - "WATCHTOWER_REVIVE_STOPPED=true"
+networks:
+    pibackbone:
+      driver: bridge
+      driver_opts:
+        com.docker.network.driver.mtu: 900
