@@ -37,8 +37,8 @@ function get_loc()
     time_between_attempts=30
     satellite_connection_flag=0
 
-    gps_dir=${1}
-    gps_out=${2}
+    gpsdir=${1}
+    gpsout=${2}
 
     echo "Getting GPS"
     echo "Enabling tracking"
@@ -62,7 +62,7 @@ function get_loc()
         if [[ $posreport == *"technology: satellite"* ]] || [[ $max_attempts -eq 1 ]]; then
             #if satellite lock is acquired, write the gps info, stop location tracking, and set our satellite connection 
             #flag to true
-            echo $posreport > "$gpsdir/$gpsout"
+            echo "$posreport" > "$gpsdir/$gpsout"
             qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true
             satellite_connection_flag=1
         else
@@ -85,7 +85,7 @@ else
         if [ -f $gpstempfile ]; then
             goaltime=$(cat $gpstempfile)
             #see if our current time is greater than or equal to the previous goaltime
-            if [ $currentepochtime -ge $goaltime ]; then
+            if [ "$currentepochtime" -ge "$goaltime" ]; then
                 mkdir -p $gpsdir
                 timestamp=$(date +%s)
                 gpsout=$hostname-$timestamp-gps.txt
