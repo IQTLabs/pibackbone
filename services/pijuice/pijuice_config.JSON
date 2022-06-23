@@ -69,7 +69,7 @@
     },
     "wakeup_on_charge": {
       "enabled": true,
-      "trigger_level": "10"
+      "trigger_level": "20"
     },
     "ext_halt_power_off": {
       "enabled": true,
