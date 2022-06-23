@@ -11,6 +11,7 @@ services:
       - "/flash/telemetry/gps:/flash/telemetry/gps"
       - "/etc/resolv.conf:/etc/resolv.conf"
       - "/sys:/sys"
+      - "/var/tmp:/var/tmp"
     command:
       - ${APN}
       - ${GPS_CHECK}
