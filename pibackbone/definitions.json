@@ -28,8 +28,8 @@
         "dtoverlay=i2c-rtc,ds1339=1,addr=0x69"
       ],
       "install": [
-        "git clone https://github.com/PiSupply/PiJuice.git",
-        "sudo dpkg -i PiJuice/Software/Install/pijuice-base_1.8_all.deb"
+        "curl -LJO https://github.com/PiSupply/PiJuice/raw/master/Software/Install/pijuice-base_1.8_all.deb",
+        "sudo dpkg -i pijuice-base_1.8_all.deb"
       ]
     },
     "s3-upload": {
