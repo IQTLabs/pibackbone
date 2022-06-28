@@ -37,6 +37,7 @@ jobs:
         pip3 install -r services/status-updater/requirements.txt && \
         pip3 install -r services/environment-sensor/requirements.txt && \
         pip3 install -r services/s3-upload/requirements.txt && \
+        pip3 install -r services/compass/requirements.txt && \
         export PYTHONPATH=$PWD/pibackbone:$PYTHONPATH && \
         pytype . && \
         pylint --fail-under=6.0 pibackbone && \
