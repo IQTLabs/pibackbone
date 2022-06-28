@@ -3,6 +3,9 @@
     "cell-sim7600g-h": {
       "config": []
     },
+    "compass": {
+      "config": []
+    },
     "daisy": {
       "config": [
         "enable_uart=1",
