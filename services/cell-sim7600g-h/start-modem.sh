@@ -45,7 +45,7 @@ function get_loc()
 
     #get cid
     resp=$(qmicli -d /dev/cdc-wdm0 -p --client-no-release-cid --loc-noop)
-    arrRESP=(${resp//\'/ })
+    arrRESP=("${resp//\'/ }")
     cid=${arrRESP[-1]}
 
     #start location tracking and wait a bit for it to lock
@@ -86,7 +86,7 @@ else
             goaltime=$(cat $gpstempfile)
             #see if our current time is greater than or equal to the previous goaltime
             if [ "$currentepochtime" -ge "$goaltime" ]; then
-                mkdir -p $gpsdir
+                mkdir -p "$gpsdir"
                 timestamp=$(date +%s)
                 gpsout=$hostname-$timestamp-gps.txt
                 get_loc "$gpsdir" "$gpsout"
@@ -96,7 +96,7 @@ else
                 sleep $GPS
             fi
         else
-                mkdir -p $gpsdir
+                mkdir -p "$gpsdir"
                 timestamp=$(date +%s)
                 gpsout=$hostname-$timestamp-gps.txt
                 get_loc "$gpsdir" "$gpsout"
