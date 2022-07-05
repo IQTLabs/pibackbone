@@ -128,3 +128,6 @@ dmypy.json
 .pyre/
 
 *.swp
+
+# OSX System Files
+*.DS_Store
