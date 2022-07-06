@@ -49,7 +49,7 @@ function get_loc()
     cid=${arrRESP[-1]}
 
     #start location tracking and wait a bit for it to lock
-    qmicli -d/dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
+    qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
     sleep 35 
 
     #while we haven't reached our maximum attempts and while we haven't established a satellite lock
