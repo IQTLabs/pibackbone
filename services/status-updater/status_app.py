@@ -250,7 +250,8 @@ class Telemetry:
             return True, len(files)
 
     def init_sensor_data(self):
-        self.sensor_data = {"system_load": [],
+        self.sensor_data = {"location": [self.location],
+                            "system_load": [],
                             "memory_used_mb": [],
                             "internet": [],
                             "disk_free_gb": [],
