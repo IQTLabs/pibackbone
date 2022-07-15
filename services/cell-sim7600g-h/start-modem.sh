@@ -36,6 +36,7 @@ function get_loc()
     #time between attempts to get a satellite fix
     time_between_attempts=30
     satellite_connection_flag=0
+    time_to_lock=35
 
     gpsdir=${1}
     gpsout=${2}
@@ -48,13 +49,13 @@ function get_loc()
     arrRESP=("${resp//\'/ }")
     cid=${arrRESP[-1]}
 
-    #start location tracking and wait a bit for it to lock
-    qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
-    sleep 35 
-
     #while we haven't reached our maximum attempts and while we haven't established a satellite lock
     while [ $max_attempts -gt 0 ] && [ $satellite_connection_flag -ne 1 ]
     do
+        #start location tracking and wait a bit for it to lock
+        qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
+        sleep $time_to_lock
+
         #get our position report
         posreport=$(qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-position-report)
         
@@ -63,13 +64,15 @@ function get_loc()
             #if satellite lock is acquired, write the gps info, stop location tracking, and set our satellite connection 
             #flag to true
             echo "$posreport" > "$gpsdir/$gpsout"
-            qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true
-            satellite_connection_flag=1
         else
             #reduce our max attempts and try again in a few
             ((max_attempts -= 1))
             sleep $time_between_attempts
         fi
+
+        qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true
+        satellite_connection_flag=1
+
     done
 
 }
