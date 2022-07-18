@@ -8,7 +8,6 @@ import os
 import sys
 
 #import docker
-from examples import custom_style_2
 from plumbum import FG  # pytype: disable=import-error
 from plumbum import local  # pytype: disable=import-error
 from plumbum import TF  # pytype: disable=import-error
@@ -22,10 +21,11 @@ from plumbum.cmd import reboot  # pytype: disable=import-error # pylint: disable
 from plumbum.cmd import shutdown  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import sudo  # pytype: disable=import-error # pylint: disable=import-error
 from plumbum.cmd import tee  # pytype: disable=import-error # pylint: disable=import-error
-from PyInquirer import prompt
+from InquirerPy import prompt
 
 from pibackbone import __file__
 from pibackbone import __version__
+from pibackbone.styles import custom_style
 
 
 level_int = {'CRITICAL': 50, 'ERROR': 40, 'WARNING': 30, 'INFO': 20,
@@ -67,7 +67,7 @@ class PiBackbone():
         Run end user prompt with supplied questions and return the selected
         answers
         """
-        answers = prompt(questions, style=custom_style_2)
+        answers = prompt(questions, style=custom_style)
         return answers
 
     @staticmethod
@@ -97,7 +97,7 @@ class PiBackbone():
         """Ask which services to start"""
         service_choices = []
         for service in self.services:
-            service_choices.append({'name': service})
+            service_choices.append({'name': service, 'value': service})
         return [
             {
                 'type': 'checkbox',
