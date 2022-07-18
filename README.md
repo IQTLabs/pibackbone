@@ -1,5 +1,5 @@
 # PiBackbone
-Backbone installer of core subsystems for Pi-based projects
+Backbone installer of core subsystems for Pi-based projects.
 
 # Getting Started
 ```
