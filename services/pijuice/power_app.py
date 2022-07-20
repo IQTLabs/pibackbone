@@ -126,7 +126,6 @@ class Power:
         pj = pijuice.PiJuice(1, 0x14)
 
         pj.config.SetBatteryProfile('PJLIPO_12000')
-        print(f'SetWatchdog() returned {sw}')
         swc = pj.power.GetWatchdog()
         print(f'GetWatchdog() returned {swc}')
 

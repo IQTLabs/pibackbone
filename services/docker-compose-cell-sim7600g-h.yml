@@ -1,7 +1,7 @@
 version: "3"
 services:
   cell-sim7600g-h:
-    image: iqtlabs/pibackbone-cell-sim7600g-h:stable
+    image: iqtlabs/pibackbone-cell-sim7600g-h:${SERVICES_IMAGE_TAG:-stable}
     restart: always
     network_mode: host
     privileged: true

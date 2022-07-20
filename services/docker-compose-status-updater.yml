@@ -1,7 +1,7 @@
 version: "3"
 services:
   status-updater:
-    image: iqtlabs/pibackbone-status-updater:stable
+    image: iqtlabs/pibackbone-status-updater:${SERVICES_IMAGE_TAG:-stable}
     restart: always
     networks:
       - pibackbone

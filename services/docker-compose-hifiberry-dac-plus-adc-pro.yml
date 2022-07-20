@@ -1,7 +1,7 @@
 version: "3"
 services:
   hifiberry-dac-plus-adc-pro:
-    image: iqtlabs/pibackbone-hifiberry-dac-plus-adc-pro:stable
+    image: iqtlabs/pibackbone-hifiberry-dac-plus-adc-pro:${SERVICES_IMAGE_TAG:-stable}
     restart: always
     network_mode: "none"
     environment:
