@@ -1,7 +1,7 @@
 version: "3"
 services:
   s3-upload:
-    image: iqtlabs/pibackbone-s3-upload:stable
+    image: iqtlabs/pibackbone-s3-upload:${SERVICES_IMAGE_TAG:-stable}
     restart: always
     networks:
       - pibackbone

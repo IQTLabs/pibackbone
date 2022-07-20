@@ -1,7 +1,7 @@
 version: "3"
 services:
   daisy:
-    image: iqtlabs/pibackbone-daisy:stable
+    image: iqtlabs/pibackbone-daisy:${SERVICES_IMAGE_TAG:-stable}
     restart: always
     network_mode: "none"
     environment:

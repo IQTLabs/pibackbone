@@ -126,10 +126,6 @@ class Power:
         pj = pijuice.PiJuice(1, 0x14)
 
         pj.config.SetBatteryProfile('PJLIPO_12000')
-        pj.rtcAlarm.SetWakeupEnabled(False)
-        pj.power.SetWakeUpOnCharge(10, True)
-        sw = pj.power.SetWatchdog(60, True)
-        print(f'SetWatchdog() returned {sw}')
         swc = pj.power.GetWatchdog()
         print(f'GetWatchdog() returned {swc}')
 

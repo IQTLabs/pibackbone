@@ -1,7 +1,7 @@
 version: "3"
 services:
   sense:
-    image: iqtlabs/pibackbone-sense:stable
+    image: iqtlabs/pibackbone-sense:${SERVICES_IMAGE_TAG:-stable}
     restart: always
     network_mode: "none"
     privileged: true

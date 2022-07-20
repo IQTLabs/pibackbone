@@ -1,7 +1,7 @@
 version: "3"
 services:
   environment-sensor:
-    image: iqtlabs/pibackbone-environment-sensor:stable
+    image: iqtlabs/pibackbone-environment-sensor:${SERVICES_IMAGE_TAG:-stable}
     restart: always
     privileged: true
     network_mode: "none"
