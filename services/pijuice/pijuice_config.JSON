@@ -65,7 +65,7 @@
     },
     "min_charge": {
       "enabled": true,
-      "threshold": "20"
+      "threshold": "5"
     },
     "wakeup_on_charge": {
       "enabled": true,
