@@ -1,3 +1,4 @@
+import argparse
 import logging
 import math
 
@@ -6,33 +7,19 @@ import falcon
 import smbus2
 from falcon_cors import CORS
 
+TWO_PI = 2 * math.pi
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 
-class Heading:
+class Compass:
 
-    def get_heading(self, calibration=0):
+    def __init__(self, address=None, utscale=None, declination=None):
         self.bus = smbus2.SMBus(1)
-        self.address = 0x0d
         self.heading_reading = 'no heading'
-        self.write_byte(11, 0b00000001)
-        self.write_byte(10, 0b00100000)
-        self.write_byte(9, 0xD)
-        scale = 0.92
-        x_offset = -10
-        y_offset = 10
-        x_out = (self.read_word_2c(0) - x_offset+2) * \
-            scale  # calculating x,y,z coordinates
-        y_out = (self.read_word_2c(2) - y_offset+2) * scale
-        z_out = self.read_word_2c(4) * scale
-        self.heading_reading = math.atan2(
-            y_out, x_out)+.48  # 0.48 is correction value
-        if(self.heading_reading < 0):
-            self.heading_reading += 2 * math.pi
-        # convert to degrees
-        self.heading_reading = (self.heading_reading * 180) / math.pi
-        self.heading_reading = (self.heading_reading + calibration) % 360
+        self.address = address
+        self.utscale = utscale # scale factor for x/y readings to micro Tesla.
+        self.declination = declination
 
     def read_byte(self, adr):  # communicate with compass
         return self.bus.read_byte_data(self.address, adr)
@@ -45,10 +32,9 @@ class Heading:
 
     def read_word_2c(self, adr):
         val = self.read_word(adr)
-        if (val >= 0x8000):
+        if val >= 0x8000:
             return -((65535 - val)+1)
-        else:
-            return val
+        return val
 
     def write_byte(self, adr, value):
         self.bus.write_byte_data(self.address, adr, value)
@@ -59,10 +45,72 @@ class Heading:
         resp.content_type = falcon.MEDIA_TEXT
         resp.status = falcon.HTTP_200
 
+    def x_y_to_degrees(self, x_out, y_out, calibration):
+        heading = math.atan2(y_out, x_out) + self.declination
+
+        if heading < 0:
+            heading += TWO_PI
+        if heading > TWO_PI:
+            heading -= TWO_PI
+
+        # convert from radians to degrees
+        heading = (heading * 180) / math.pi
+        # calibration is in degrees, offset from compass reading.
+        heading = (heading + calibration) % 360
+        return heading
+
+
+    def get_heading(self, calibration):
+        return
+
+
+class QMC5883L(Compass):
+    """QMC5883L.
+
+       See https://github.com/keepworking/Mecha_QMC5883L and
+       https://datasheet.lcsc.com/lcsc/2012221837_QST-QMC5883L_C976032.pdf.
+    """
+
+    def __init__(self, declination):
+        super().__init__(address=0x0d, utscale=0.92, declination=declination)
+
+    def get_heading(self, calibration):
+        self.write_byte(11, 0b00000001)
+        self.write_byte(10, 0b00100000)
+        self.write_byte(9, 0xD)
+        x_offset = -10
+        y_offset = 10
+        x_out = (self.read_word_2c(0) - x_offset+2) * self.utscale
+        y_out = (self.read_word_2c(2) - y_offset+2) * self.utscale
+        # must read Z even though not used, else compass won't update because
+        # the measurement as considered incomplete.
+        _z_out = self.read_word_2c(4)
+        self.heading_reading = self.x_y_to_degrees(x_out, y_out, calibration)
+
+
+class MMC5883MA(Compass):
+    """MMC5883MA.
+
+    See https://github.com/adafruit/Adafruit_MMC5883 and
+    https://www.mouser.com/datasheet/2/821/MMC5883MA-RevC-1219541.pdf.
+    """
+
+    def __init__(self, declination):
+        super().__init__(address=0x30, utscale=0.025, declination=declination)
+
+    def get_heading(self, calibration):
+        self.write_byte(0x0a, 0x01) # continuous measurement at 14Hz
+        # read x, y, z and convert to uT
+        x_out = (self.read_word(0) - 0x8000) * self.utscale
+        y_out = (self.read_word(2) - 0x8000) * self.utscale
+        _z_out = self.read_word(4)
+        self.heading_reading = self.x_y_to_degrees(x_out, y_out, calibration)
+
 
 class CompassAPI:
 
-    def __init__(self):
+    def __init__(self, compass):
+        self.compass = compass
         cors = CORS(allow_all_origins=True)
         self.app = falcon.App(middleware=[cors.middleware])
         self.main()
@@ -77,8 +125,7 @@ class CompassAPI:
 
     def routes(self):
         p = self.paths()
-        heading = Heading()
-        funcs = [heading]
+        funcs = [self.compass]
         return dict(zip(p, funcs))
 
     def main(self):
@@ -91,5 +138,17 @@ class CompassAPI:
         bjoern.run(self.app, '0.0.0.0', 8000)
 
 
+COMPASS_MAP = {'qmc5883l': QMC5883L, 'mmc5883ma': MMC5883MA}
+
+
+def argument_parser():
+    parser = argparse.ArgumentParser(prog='compass', description='serve compass heading requests')
+    parser.add_argument('--compass', choices=sorted(COMPASS_MAP.keys()), default='qmc5883l', help='compass type to use')
+    parser.add_argument('--declination', type=float, default=0.48, help='magnetic declination angle in radians to use (location dependant)')
+    return parser
+
+
 if __name__ == "__main__":
-    CompassAPI()
+    args = argument_parser().parse_args()
+    compass = COMPASS_MAP[args.compass](declination=args.declination)
+    CompassAPI(compass=compass)
