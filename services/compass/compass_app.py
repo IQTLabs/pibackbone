@@ -59,8 +59,8 @@ class Compass:
         heading = (heading + calibration) % 360
         return heading
 
-
-    def get_heading(self, calibration):
+    @staticmethod
+    def get_heading(calibration):
         return
 
 
