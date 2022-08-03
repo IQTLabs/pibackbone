@@ -14,12 +14,13 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 class Compass:
 
-    def __init__(self, address=None, utscale=None, declination=None):
+    def __init__(self, address=None, utscale=None, declination=None, calibration=None):
         self.bus = smbus2.SMBus(1)
         self.heading_reading = 'no heading'
         self.address = address
         self.utscale = utscale # scale factor for x/y readings to micro Tesla.
         self.declination = declination
+        self.calibration = calibration
 
     def read_byte(self, adr):  # communicate with compass
         return self.bus.read_byte_data(self.address, adr)
@@ -39,8 +40,10 @@ class Compass:
     def write_byte(self, adr, value):
         self.bus.write_byte_data(self.address, adr, value)
 
-    def on_get(self, _req, resp, calibration):
-        self.get_heading(calibration=int(calibration))
+    def on_get(self, _req, resp, calibration=None):
+        if calibration is None:
+            calibration = self.calibration
+        self.get_heading(calibration=float(calibration))
         resp.text = str(self.heading_reading)
         resp.content_type = falcon.MEDIA_TEXT
         resp.status = falcon.HTTP_200
@@ -71,8 +74,9 @@ class QMC5883L(Compass):
        https://datasheet.lcsc.com/lcsc/2012221837_QST-QMC5883L_C976032.pdf.
     """
 
-    def __init__(self, declination):
-        super().__init__(address=0x0d, utscale=0.92, declination=declination)
+    def __init__(self, declination, calibration):
+        super().__init__(
+            address=0x0d, utscale=0.92, declination=declination, calibration=calibration)
 
     def get_heading(self, calibration):
         self.write_byte(11, 0b00000001)
@@ -95,8 +99,9 @@ class MMC5883MA(Compass):
     https://www.mouser.com/datasheet/2/821/MMC5883MA-RevC-1219541.pdf.
     """
 
-    def __init__(self, declination):
-        super().__init__(address=0x30, utscale=0.025, declination=declination)
+    def __init__(self, declination, calibration):
+        super().__init__(
+            address=0x30, utscale=0.025, declination=declination, calibration=calibration)
 
     def get_heading(self, calibration):
         self.write_byte(0x0a, 0x01) # continuous measurement at 14Hz
@@ -113,11 +118,13 @@ class CompassAPI:
         self.compass = compass
         cors = CORS(allow_all_origins=True)
         self.app = falcon.App(middleware=[cors.middleware])
-        self.main()
+        r = self.routes()
+        for route in r:
+            self.app.add_route(self.version()+route, r[route])
 
     @staticmethod
     def paths():
-        return ['/{calibration}']
+        return ['/{calibration}', '/heading']
 
     @staticmethod
     def version():
@@ -125,15 +132,10 @@ class CompassAPI:
 
     def routes(self):
         p = self.paths()
-        funcs = [self.compass]
+        funcs = [self.compass for _ in range(len(p))]
         return dict(zip(p, funcs))
 
     def main(self):
-        logging.info('adding API routes')
-        r = self.routes()
-        for route in r:
-            self.app.add_route(self.version()+route, r[route])
-
         logging.info('starting API thread')
         bjoern.run(self.app, '0.0.0.0', 8000)
 
@@ -145,10 +147,12 @@ def argument_parser():
     parser = argparse.ArgumentParser(prog='compass', description='serve compass heading requests')
     parser.add_argument('--compass', choices=sorted(COMPASS_MAP.keys()), default='qmc5883l', help='compass type to use')
     parser.add_argument('--declination', type=float, default=0.48, help='magnetic declination angle in radians to use (location dependant)')
+    parser.add_argument('--calibration', type=float, default=0, help='calibration offset from north in degrees')
     return parser
 
 
 if __name__ == "__main__":
     args = argument_parser().parse_args()
-    compass = COMPASS_MAP[args.compass](declination=args.declination)
-    CompassAPI(compass=compass)
+    compass = COMPASS_MAP[args.compass](declination=args.declination, calibration=args.calibration)
+    api = CompassAPI(compass=compass)
+    api.main()
