@@ -48,63 +48,63 @@ jobs:
       run: |
         cd services/pijuice && \
         docker buildx build \
-          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
           --push \
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-pijuice:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-pijuice:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
         cd ../daisy && \
         docker buildx build \
-          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
           --push \
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-daisy:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-daisy:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
         cd ../hifiberry-dac-plus-adc-pro && \
         docker buildx build \
-          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
           --push \
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-hifiberry-dac-plus-adc-pro:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-hifiberry-dac-plus-adc-pro:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
         cd ../status-updater && \
         docker buildx build \
-          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
           --push \
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-status-updater:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-status-updater:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
         cd ../cell-sim7600g-h && \
         docker buildx build \
-          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
           --push \
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-cell-sim7600g-h:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-cell-sim7600g-h:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
         cd ../environment-sensor && \
         docker buildx build \
-          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
           --push \
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-environment-sensor:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-environment-sensor:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
         cd ../s3-upload && \
         docker buildx build \
-          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
           --push \
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-s3-upload:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-s3-upload:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
         cd ../compass && \
         docker buildx build \
-          --platform linux/arm/v6,linux/arm/v7,linux/arm64 \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
           --push \
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-compass:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-compass:${{ steps.change_tag.outputs.IMAGE_TAG }} . && \
         cd ../sense && \
         docker buildx build \
-          --platform linux/arm/v6,linux/arm/v7,linux/arm64\
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
           --push \
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-sense:${{ steps.change_version.outputs.VERSION }} \
