@@ -34,13 +34,13 @@ class Telemetry:
         self.hydrophone_dir = os.path.join(base_dir, 'hydrophone')
         self.power_dir = os.path.join(base_dir, 'power')
         self.s3_dir = '/flash/s3'
-        self.ais_file = None
+        self.ais_file = os.path.join(self.ais_dir, 'false')
         self.ais_records = 0
-        self.gps_file = None
-        self.hydrophone_file = None
+        self.gps_file = os.path.join(self.gps_dir, 'false')
+        self.hydrophone_file = os.path.join(self.hydrophone_dir, 'false')
         self.hydrophone_size = 0
-        self.power_file = None
-        self.sensor_file = None
+        self.power_file = os.path.join(self.power_dir, 'false')
+        self.sensor_file = os.path.join(self.sensor_dir, 'false')
         self.sensor_data = {}
         self.alerts = {}
         self.docker = docker.from_env()
@@ -111,7 +111,7 @@ class Telemetry:
             files = None
 
         if not files:
-            self.ais_file = None
+            self.ais_file = os.path.join(self.ais_dir, 'false')
             self.ais_records = 0
             return False
         elif os.path.join(self.ais_dir, files[-1]) != self.ais_file:
@@ -134,7 +134,7 @@ class Telemetry:
             files = None
 
         if not files:
-            self.gps_file = None
+            self.gps_file = os.path.join(self.gps_dir, 'false')
             return
         elif os.path.join(self.gps_dir, files[-1]) != self.gps_file:
             self.gps_file = os.path.join(self.gps_dir, files[-1])
@@ -180,7 +180,7 @@ class Telemetry:
             files = None
 
         if not files:
-            self.sensor_file = None
+            self.sensor_file = os.path.join(self.sensor_dir, 'false')
             return
         elif os.path.join(self.sensor_dir, files[-1]) != self.sensor_file:
             self.sensor_file = os.path.join(self.sensor_dir, files[-1])
@@ -201,7 +201,7 @@ class Telemetry:
             files = None
 
         if not files:
-            self.power_file = None
+            self.power_file = os.path.join(self.power_dir, 'false')
             return
         elif os.path.join(self.power_dir, files[-1]) != self.power_file:
             self.power_file = os.path.join(self.power_dir, files[-1])
@@ -223,7 +223,7 @@ class Telemetry:
 
         # no files
         if not files:
-            self.hydrophone_file = None
+            self.hydrophone_file = os.path.join(self.hydrophone_dir, 'false')
             self.hydrophone_size = 0
             return False
         # found a new file
