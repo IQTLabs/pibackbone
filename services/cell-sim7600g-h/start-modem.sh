@@ -32,11 +32,11 @@ ip link set dev wwan0 mtu 900
 function get_loc()
 {
     #maximum number of attempts to get a satellite fix before defaulting to cellular
-    max_attempts=5
+    max_attempts=2
     #time between attempts to get a satellite fix
     time_between_attempts=30
     satellite_connection_flag=0
-    time_to_lock=35
+    time_to_lock=420
 
     gpsdir=${1}
     gpsout=${2}
@@ -46,35 +46,40 @@ function get_loc()
 
     #get cid
     resp=$(qmicli -d /dev/cdc-wdm0 -p --client-no-release-cid --loc-noop)
-    arrRESP=("${resp//\'/ }")
+    arrRESP=(${resp//\'/ })
     cid=${arrRESP[-1]}
+
+    echo "Current operation mode:"
+    echo $(qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-operation-mode)
+    qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
 
     #while we haven't reached our maximum attempts and while we haven't established a satellite lock
     while [ $max_attempts -gt 0 ] && [ $satellite_connection_flag -ne 1 ]
     do
         #start location tracking and wait a bit for it to lock
-        qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
         sleep $time_to_lock
 
         #get our position report
+        echo "Position report:"
         posreport=$(qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-position-report)
         
+        echo $posreport
+
         #check if our position report is based on a satellite lock or if we're on our last attempt
         if [[ $posreport == *"technology: satellite"* ]] || [[ $max_attempts -eq 1 ]]; then
             #if satellite lock is acquired, write the gps info, stop location tracking, and set our satellite connection 
             #flag to true
             echo "$posreport" > "$gpsdir/$gpsout"
+            satellite_connection_flag=1
         else
             #reduce our max attempts and try again in a few
+            echo "Unable to get location... retrying"
             ((max_attempts -= 1))
             sleep $time_between_attempts
         fi
-
-        qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true
-        satellite_connection_flag=1
-
     done
 
+    qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true\
 }
 
 if [ $GPS -eq 0 ]; then
