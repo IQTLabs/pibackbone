@@ -50,7 +50,9 @@ function get_loc()
     cid=${arrRESP[-1]}
 
     echo "Current operation mode:"
-    echo $(qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-operation-mode)
+    operatingmode=$(qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-operation-mode)
+    echo "$operatingmode"
+
     qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
 
     #while we haven't reached our maximum attempts and while we haven't established a satellite lock
@@ -63,7 +65,7 @@ function get_loc()
         echo "Position report:"
         posreport=$(qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-position-report)
         
-        echo $posreport
+        echo "$posreport"
 
         #check if our position report is based on a satellite lock or if we're on our last attempt
         if [[ $posreport == *"technology: satellite"* ]] || [[ $max_attempts -eq 1 ]]; then
