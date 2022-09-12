@@ -79,7 +79,7 @@ function get_loc()
         fi
     done
 
-    qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true\
+    qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --loc-stop || true
 }
 
 if [ $GPS -eq 0 ]; then
