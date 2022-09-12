@@ -49,10 +49,6 @@ function get_loc()
     arrRESP=(${resp//\'/ })
     cid=${arrRESP[-1]}
 
-    echo "Current operating mode:"
-    operatingmode=$(qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-get-operating-mode)
-    echo "$operatingmode"
-
     qmicli -d /dev/cdc-wdm0 -p --client-cid="$cid" --client-no-release-cid --loc-start
 
     #while we haven't reached our maximum attempts and while we haven't established a satellite lock
