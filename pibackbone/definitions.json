@@ -21,6 +21,9 @@
     "environment-sensor": {
       "config": []
     },
+    "freespacer": {
+      "config": []
+    },
     "hifiberry-dac-plus-adc-pro": {
       "config": [
         "dtoverlay=hifiberry-dacplusadcpro"
