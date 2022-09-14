@@ -53,7 +53,7 @@ def main():
     args = argument_parser().parse_args()
     while True:
         make_free_space(args.path, args.min_used_pct)
-        time.sleep(arg.wait_time)
+        time.sleep(args.wait_time)
 
 
 if __name__ == '__main__':
