@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import os
-import subprocess
 import tempfile
 import unittest
 from freespacer_app import make_free_space, argument_parser
@@ -9,7 +8,8 @@ from freespacer_app import make_free_space, argument_parser
 
 class apptest(unittest.TestCase):
 
-    def test_arg_parser(self):
+    @staticmethod
+    def test_arg_parser():
         argument_parser()
 
     def test_tar_dir(self):
