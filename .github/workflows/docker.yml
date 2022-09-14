@@ -109,4 +109,11 @@ jobs:
           --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
           -t iqtlabs/pibackbone-sense:${{ steps.change_version.outputs.VERSION }} \
           -t iqtlabs/pibackbone-sense:${{ steps.change_tag.outputs.IMAGE_TAG }} .
+        cd ../freespacer && \
+        docker buildx build \
+          --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64 \
+          --push \
+          --build-arg VERSION=${{ steps.change_version.outputs.VERSION }}.${{ steps.get_version.outputs.SHA_SHORT }} \
+          -t iqtlabs/pibackbone-sense:${{ steps.change_version.outputs.VERSION }} \
+          -t iqtlabs/pibackbone-sense:${{ steps.change_tag.outputs.IMAGE_TAG }} .
       if: github.repository == 'iqtlabs/pibackbone' && github.event_name == 'push'
