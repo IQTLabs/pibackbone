@@ -7,7 +7,7 @@ services:
     environment:
       - "HOSTNAME=${HOSTNAME}"
     command:
-      - --path=/flash/telemetry
-      - --min_used_pct=90
+      - "/flash/telemetry"
+      - "90"
     volumes:
       - "/flash/telemetry:/flash/telemetry"
