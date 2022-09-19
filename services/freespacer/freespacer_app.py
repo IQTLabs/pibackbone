@@ -14,7 +14,7 @@ DF_RE = re.compile('^.+\s+(\d+)\S+$')
 def make_free_space(path, min_used_pct):
 
     def enough_free():
-        df_out = subprocess.check_output(["df", "--output=pcent", path])
+        df_out = subprocess.check_output(["/usr/bin/df", "--output=pcent", path])
         df_match = DF_RE.match("".join(df_out.decode('utf8').splitlines()))
         if not df_match:
             raise ValueError(f"unexpected df output: {df_out}")
