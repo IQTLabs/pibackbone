@@ -4,16 +4,22 @@ import argparse
 import glob
 import logging
 import os
-import shutil
+import re
+import subprocess
 import time
+
+DF_RE = re.compile('^.+\s+(\d+)\S+$')
 
 
 def make_free_space(path, min_used_pct):
 
     def enough_free():
-        usage = shutil.disk_usage(path)
-        used_pct = usage.used / usage.total * 100
-        logging.info("used space now %.f%%", used_pct)
+        df_out = subprocess.check_output(["/usr/bin/df", "--output=pcent", path])
+        df_match = DF_RE.match("".join(df_out.decode('utf8').splitlines()))
+        if not df_match:
+            raise ValueError(f"unexpected df output: {df_out}")
+        used_pct = int(df_match.group(1))
+        logging.info("used space now %u%%", used_pct)
         return (used_pct < min_used_pct)
 
     removed = []
