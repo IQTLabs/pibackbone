@@ -8,7 +8,7 @@ import re
 import subprocess
 import time
 
-DF_RE = re.compile('^.+\s+(\d+)\S+$')
+DF_RE = re.compile('^.+(\d+)\S+$')
 
 
 def make_free_space(path, min_used_pct):
