@@ -8,17 +8,15 @@ import re
 import subprocess
 import time
 
-DF_RE = re.compile('^.+(\d+)\S+$')
-
 
 def make_free_space(path, min_used_pct):
 
     def enough_free():
         df_out = subprocess.check_output(["/bin/df", "--output=pcent", path])
-        df_match = DF_RE.match("".join(df_out.decode('utf8').splitlines()))
+        df_match = re.findall(r'\d+', "".join(df_out.decode('utf8').splitlines()))
         if not df_match:
             raise ValueError(f"unexpected df output: {df_out}")
-        used_pct = int(df_match.group(1))
+        used_pct = int(df_match[0])
         logging.info("used space now %u%%", used_pct)
         return (used_pct < min_used_pct)
 
