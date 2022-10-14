@@ -1,5 +1,6 @@
 import os
 import time
+from webbrowser import get
 
 import httpx
 
@@ -8,7 +9,7 @@ def get_url():
     return os.getenv("WEBHOOK_URL", "")
 
 def get_webhook_token():
-    return os.getenc("WEBHOOK_TOKEN","")
+    return os.getenv("WEBHOOK_TOKEN","")
 
 def message_card_template():
     timestamp = int(time.time())
@@ -55,7 +56,10 @@ def insert_message_data(data):
 
 def send_hook(card):
     try:
-        headers = {'Device-Token': get_webhook_token()}
+        headers = {}
+        webhook_token = get_webhook_token()
+        if webhook_token is not None and webhook_token != "":
+            headers = {'Device-Token': webhook_token}
 
         r = httpx.post(get_url(), headers=headers, json=card, timeout=5.0)
         return r.status_code
