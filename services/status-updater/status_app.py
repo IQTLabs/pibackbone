@@ -18,7 +18,7 @@ class Telemetry:
     def __init__(self, base_dir='/flash/telemetry'):
         # plus 0.5 second for status per wake and plus time to run loop
         self.MINUTES_BETWEEN_WAKES = 0.1  # roughly every 5 seconds (not 6 because of the above considerations)
-        self.MINUTES_BETWEEN_WRITES = 15
+        self.MINUTES_BETWEEN_WRITES = 5
         self.CYCLES_BEFORE_STATUS_CHECK = 1/self.MINUTES_BETWEEN_WAKES
         # if waking up less than once a minute, just set the status check to the same amount of time as the wake cycle
         if self.CYCLES_BEFORE_STATUS_CHECK < 1:

@@ -7,6 +7,9 @@ import httpx
 def get_url():
     return os.getenv("WEBHOOK_URL", "")
 
+def get_webhook_token():
+    return os.getenc("WEBHOOK_TOKEN","")
+
 def message_card_template():
     timestamp = int(time.time())
     card = {
@@ -52,7 +55,9 @@ def insert_message_data(data):
 
 def send_hook(card):
     try:
-        r = httpx.post(get_url(), json=card, timeout=5.0)
+        headers = {'Device-Token': get_webhook_token()}
+
+        r = httpx.post(get_url(), headers=headers, json=card, timeout=5.0)
         return r.status_code
     except Exception as e:
         return f'Failed because: {e}, on card: {card}'
