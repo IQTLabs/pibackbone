@@ -9,6 +9,7 @@ services:
       - "HOSTNAME=${HOSTNAME}"
       - "LOCATION=${LOCATION}"
       - "WEBHOOK_URL=${WEBHOOK_URL}"
+      - "WEBHOOK_TOKEN=${WEBHOOK_TOKEN}"
     volumes:
       - "/flash:/flash"
       - "/var/run/docker.sock:/var/run/docker.sock"
