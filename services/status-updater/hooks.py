@@ -1,6 +1,5 @@
 import os
 import time
-from webbrowser import get
 
 import httpx
 
