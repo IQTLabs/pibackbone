@@ -53,7 +53,7 @@ class SGP40:
         # feature set 0x3220
         self.write(SGP40_CMD_FEATURE_SET)
         sleep_time = 0.25
-        time.sleep(sleep_time)    
+        time.sleep(sleep_time)
         Rbuf = self.Read() 
         # print('feature set:%#x'% ((int(Rbuf[0]) << 8) | Rbuf[1]))
         if ((int(Rbuf[0]) << 8) | Rbuf[1]) != 0x3220:
