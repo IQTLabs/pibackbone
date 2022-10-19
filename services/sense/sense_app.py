@@ -183,7 +183,8 @@ class Telemetry:
                 write_cycles = 1
 
             # Keep lights for 0.5 second
-            time.sleep(0.5)
+            light_time = 0.5
+            time.sleep(light_time)
 
             # Turn off all pixels
             self.sense.set_pixels([off]*64)

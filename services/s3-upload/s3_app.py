@@ -90,7 +90,8 @@ def main():
     schedule.every().hour.do(job, hostname=hostname, status=True)
     while True:
         schedule.run_pending()
-        time.sleep(60)
+        sleep_time = 60
+        time.sleep(sleep_time)
 
 
 if __name__ == '__main__':

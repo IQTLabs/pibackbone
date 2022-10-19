@@ -96,7 +96,8 @@ class Power:
 
 
     def poll_wait(self):
-        time.sleep(60)
+        wait_time = 60
+        time.sleep(wait_time)
 
 
     def main(self, get_pijuice=None, poll_wait=None):
@@ -121,7 +122,8 @@ class Power:
         data = self.init_data()
 
         while not os.path.exists(self.root_path('dev/i2c-1')):
-            time.sleep(0.1)
+            sleep_time = 0.1
+            time.sleep(sleep_time)
 
         pj = pijuice.PiJuice(1, 0x14)
 

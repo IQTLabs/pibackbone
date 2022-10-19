@@ -123,11 +123,13 @@ class ICM20948(object):
     self._address = address
     self._bus = smbus.SMBus(1)
     bRet=self.icm20948Check()             #Initialization of the device multiple times after power on will result in a return error
-    time.sleep(0.5)                       #We can skip this detection by delaying it by 500 milliseconds
+    sleep_time = 0.5
+    time.sleep(sleep_time)                       #We can skip this detection by delaying it by 500 milliseconds
     # user bank 0 register 
     self._write_byte( REG_ADD_REG_BANK_SEL , REG_VAL_REG_BANK_0)
     self._write_byte( REG_ADD_PWR_MIGMT_1 , REG_VAL_ALL_RGE_RESET)
-    time.sleep(0.1)
+    sleep_time = 0.1
+    time.sleep(sleep_time)
     self._write_byte( REG_ADD_PWR_MIGMT_1 , REG_VAL_RUN_MODE)  
     #user bank 2 register
     self._write_byte( REG_ADD_REG_BANK_SEL , REG_VAL_REG_BANK_2)
@@ -137,7 +139,8 @@ class ICM20948(object):
     self._write_byte( REG_ADD_ACCEL_CONFIG , REG_VAL_BIT_ACCEL_DLPCFG_6 | REG_VAL_BIT_ACCEL_FS_2g | REG_VAL_BIT_ACCEL_DLPF)
     #user bank 0 register
     self._write_byte( REG_ADD_REG_BANK_SEL , REG_VAL_REG_BANK_0) 
-    time.sleep(0.1)
+    sleep_time = 0.1
+    time.sleep(sleep_time)
     self.GyroOffset()
     self.MagCheck()
     self.WriteSecondary( I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_WRITE,REG_ADD_MAG_CNTL2, REG_VAL_MAG_MODE_20HZ)
@@ -180,7 +183,8 @@ class ICM20948(object):
   def MagRead(self):
     counter=20
     while(counter>0):
-      time.sleep(0.01)
+      sleep_time = 0.1
+      time.sleep(sleep_time)
       self.icm20948ReadSecondary( I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ , REG_ADD_MAG_ST2, 1)
       if ((pu8data[0] & 0x01)!= 0):
         break
@@ -219,7 +223,8 @@ class ICM20948(object):
     u8Temp = self._read_byte(REG_ADD_USER_CTRL)
     u8Temp |= REG_VAL_BIT_I2C_MST_EN
     self._write_byte( REG_ADD_USER_CTRL, u8Temp)
-    time.sleep(0.01)
+    sleep_time = 0.01
+    time.sleep(sleep_time)
     u8Temp &= ~REG_VAL_BIT_I2C_MST_EN
     self._write_byte( REG_ADD_USER_CTRL, u8Temp)
     
@@ -247,7 +252,8 @@ class ICM20948(object):
     u8Temp = self._read_byte(REG_ADD_USER_CTRL)
     u8Temp |= REG_VAL_BIT_I2C_MST_EN
     self._write_byte( REG_ADD_USER_CTRL, u8Temp)
-    time.sleep(0.01)
+    sleep_time = 0.01
+    time.sleep(sleep_time)
     u8Temp &= ~REG_VAL_BIT_I2C_MST_EN
     self._write_byte( REG_ADD_USER_CTRL, u8Temp)
 
@@ -268,7 +274,8 @@ class ICM20948(object):
       s32TempGx += Gyro[0]
       s32TempGy += Gyro[1]
       s32TempGz += Gyro[2]
-      time.sleep(0.01)
+      sleep_time = 0.01
+      time.sleep(sleep_time)
     GyroOffset[0] = s32TempGx >> 5
     GyroOffset[1] = s32TempGy >> 5
     GyroOffset[2] = s32TempGz >> 5
@@ -285,7 +292,8 @@ class ICM20948(object):
     
   def _write_byte(self,cmd,val):
     self._bus.write_byte_data(self._address,cmd,val)
-    time.sleep(0.0001)
+    sleep_time = 0.0001
+    time.sleep(sleep_time)
     
   def imuAHRSupdata(self,gx, gy,gz,ax,ay,az,mx,my,mz):    
     norm=0.0
@@ -391,7 +399,8 @@ class ICM20948(object):
     
     MotionVal=[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
     MotionVal = self.CalAvgValue()
-    time.sleep(0.1)
+    sleep_time = 0.1
+    time.sleep(sleep_time)
     self.imuAHRSupdata(MotionVal[0] * 0.0175, MotionVal[1] * 0.0175,MotionVal[2] * 0.0175,
         MotionVal[3],MotionVal[4],MotionVal[5], 
         MotionVal[6], MotionVal[7], MotionVal[8])

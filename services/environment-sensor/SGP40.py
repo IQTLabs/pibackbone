@@ -51,8 +51,9 @@ class SGP40:
         self.address = address
         
         # feature set 0x3220
-        self.write(SGP40_CMD_FEATURE_SET)    
-        time.sleep(0.25)
+        self.write(SGP40_CMD_FEATURE_SET)
+        sleep_time = 0.25
+        time.sleep(sleep_time)    
         Rbuf = self.Read() 
         # print('feature set:%#x'% ((int(Rbuf[0]) << 8) | Rbuf[1]))
         if ((int(Rbuf[0]) << 8) | Rbuf[1]) != 0x3220:
@@ -60,7 +61,8 @@ class SGP40:
         
         # Self Test 0xD400      
         self.write(SGP40_CMD_MEASURE_TEST)    
-        time.sleep(0.25)
+        sleep_time = 0.25
+        time.sleep(sleep_time)
         Rbuf = self.Read()
         # print('Self Test  :%#x'% ((int(Rbuf[0]) << 8) | Rbuf[1]))
         if ((int(Rbuf[0]) << 8) | Rbuf[1]) != 0xD400: #0x4B00 is failed,0xD400 pass
@@ -82,7 +84,8 @@ class SGP40:
         """The raw gas value"""
         # recycle a single buffer
         self.write_block(WITHOUT_HUM_COMP)
-        time.sleep(0.25)
+        sleep_time = 0.25
+        time.sleep(sleep_time)
         Rbuf = self.Read()
         return ((int(Rbuf[0]) << 8) | Rbuf[1])
         
@@ -106,7 +109,8 @@ class SGP40:
         #print(WITH_HUM_COMP)
         self.write_block(WITH_HUM_COMP)
         
-        time.sleep(0.5)
+        sleep_time = 0.5
+        time.sleep(sleep_time)
         Rbuf = self.Read()
         # print(Rbuf)
         return ((int(Rbuf[0]) << 8) | Rbuf[1])
@@ -122,13 +126,15 @@ class SGP40:
 
 if __name__ == '__main__':
     sgp = SGP40()
-    time.sleep(1)
+    sleep_time = 1
+    time.sleep(sleep_time)
     try:
         while True:
             # print("Raw Gas: ", sgp.raw())
             print("measureRaw Gas: %d" %sgp.measureRaw(25, 50))
             
-            time.sleep(1)
+            sleep_time = 1
+            time.sleep(sleep_time)
 
     except KeyboardInterrupt:
         exit()
