@@ -1,3 +1,4 @@
+# nosemgrep:github.workflows.config.dockerfile-source-not-pinned
 FROM python:3.10-slim
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 ENV PYTHONUNBUFFERED 1
@@ -11,5 +12,7 @@ COPY hooks.py /hooks.py
 COPY internet_check.sh /internet_check.sh
 ARG VERSION
 ENV VERSION $VERSION
+# nosemgrep:github.workflows.config.missing-user
 ENTRYPOINT ["python3", "/status_app.py"]
+# nosemgrep:github.workflows.config.missing-user
 CMD [""]

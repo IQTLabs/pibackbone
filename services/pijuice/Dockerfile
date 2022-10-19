@@ -1,3 +1,4 @@
+# nosemgrep:github.workflows.config.dockerfile-source-not-pinned
 FROM python:3.10-slim
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 ENV PYTHONUNBUFFERED 1
@@ -20,5 +21,7 @@ COPY pijuice_config.JSON /pijuice_config.JSON
 COPY shutdown.sh /shutdown.sh
 ARG VERSION
 ENV VERSION $VERSION
+# nosemgrep:github.workflows.config.missing-user
 ENTRYPOINT ["python3", "/power_app.py"]
+# nosemgrep:github.workflows.config.missing-user
 CMD [""]
