@@ -174,12 +174,14 @@ class TSL2591:
 if __name__ == '__main__':
     sensor = TSL2591()
     # sensor.SET_LuxInterrupt(20, 200)
-    time.sleep(1)
+    sleep_time = 1
+    time.sleep(sleep_time)
     try:
         while True:
             lux = sensor.Lux()
             print("Lux: %d" %lux)
-            time.sleep(0.5)
+            sleep_time = 0.5
+            time.sleep(sleep_time)
             
     except KeyboardInterrupt:
         # sensor.Disable()

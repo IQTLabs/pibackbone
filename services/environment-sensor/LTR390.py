@@ -74,12 +74,14 @@ class LTR390:
 
 if __name__ == '__main__':
     sensor = LTR390()
-    time.sleep(1)
+    sleep_time = 1
+    time.sleep(sleep_time)
     try:
         while True:
             UVS = sensor.UVS()
             print("UVS: %d" %UVS)
-            time.sleep(0.5)
+            sleep_time = 0.5
+            time.sleep(sleep_time)
             
     except KeyboardInterrupt:
         # sensor.Disable()

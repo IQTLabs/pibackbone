@@ -141,7 +141,8 @@ class BME280:
 if __name__ == '__main__':
     sensor = BME280()
     sensor.get_calib_param()
-    time.sleep(1)
+    sleep_time = 1
+    time.sleep(sleep_time)
     try:
         # sensor.setup()
         data = []

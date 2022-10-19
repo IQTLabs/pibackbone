@@ -65,7 +65,8 @@ class AIS:
                                 f.write('{"error":"'+str(record)+'"}\n')
                     records = []
                 records = self.getAIS(aisc, records)
-                time.sleep(1)
+                sleep_time = 1
+                time.sleep(sleep_time)
             except KeyboardInterrupt:
                 running = False
                 aisc.close()
