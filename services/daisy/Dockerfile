@@ -1,5 +1,5 @@
 # nosemgrep:github.workflows.config.dockerfile-source-not-pinned
-FROM python:3.10-slim
+FROM python:3.11-slim
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 ENV PYTHONUNBUFFERED 1
 RUN apt-get update && apt-get install --no-install-recommends -y build-essential
