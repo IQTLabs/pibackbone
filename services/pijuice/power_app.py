@@ -127,7 +127,12 @@ class Power:
 
         pj = pijuice.PiJuice(1, 0x14)
 
+        # This mix of commands works to wake the system at 50% charge
         pj.config.SetBatteryProfile('PJLIPO_12000')
+        pj.rtcAlarm.SetWakeupEnabled(False)
+        pj.power.SetWakeUpOnCharge(50, True)
+        sw = pj.power.SetWatchdog(60, True)
+        print(f'SetWatchdog() returned {sw}')
         swc = pj.power.GetWatchdog()
         print(f'GetWatchdog() returned {swc}')
 
