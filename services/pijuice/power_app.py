@@ -18,6 +18,7 @@ class Power:
         self.time_sec = time_sec
         self.uid = int(uid)
         self.gid = int(gid)
+        self.timestamp = self.time_sec()
 
     def _time_sec(self):
         return int(time.time())
