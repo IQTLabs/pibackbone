@@ -38,7 +38,6 @@ class Power:
 
     def init_data(self):
         self.timestamp = self.time_sec()
-        self.rename_dotfiles()
         pijuice_data = {"battery_charge": [],
                         "battery_voltage": [],
                         "battery_current": [],
@@ -143,6 +142,7 @@ class Power:
                 self.write_data(data)
                 if write_cycles == 15:  # write out every 15 minutes
                     #self.write_data(data)
+                    self.rename_dotfiles()
                     data = self.init_data()
                     write_cycles = 1
                 write_cycles += 1
