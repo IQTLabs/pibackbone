@@ -27,6 +27,8 @@ class Power:
         for dotfile in glob.glob(os.path.join(self.data_dir, '.*')):
             basename = os.path.basename(dotfile)
             non_dotfile = os.path.join(self.data_dir, basename[1:])
+            if os.path.isfile(non_dotfile):
+                os.remove(non_dotfile)
             os.rename(dotfile, non_dotfile)
 
     def write_data(self, data):
@@ -35,6 +37,7 @@ class Power:
             for key in data.keys():
                 record = {"target":key, "datapoints": data[key]}
                 f.write(f'{json.dumps(record)}\n')
+        self.rename_dotfiles()
 
     def init_data(self):
         self.timestamp = self.time_sec()
@@ -141,8 +144,6 @@ class Power:
                 data = self.get_data(pj, data)
                 self.write_data(data)
                 if write_cycles == 15:  # write out every 15 minutes
-                    #self.write_data(data)
-                    self.rename_dotfiles()
                     data = self.init_data()
                     write_cycles = 1
                 write_cycles += 1
