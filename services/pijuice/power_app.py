@@ -29,16 +29,15 @@ class Power:
             os.rename(dotfile, non_dotfile)
 
     def write_data(self, data):
-        timestamp = self.time_sec()
-        tmp_filename = f'{self.data_dir}/.{self.hostname}-{timestamp}-power.json'
-        with open(tmp_filename, 'a') as f:
+        tmp_filename = f'{self.data_dir}/.{self.hostname}-{self.timestamp}-power.json'
+        with open(tmp_filename, 'w') as f:
             for key in data.keys():
                 record = {"target":key, "datapoints": data[key]}
                 f.write(f'{json.dumps(record)}\n')
         self.rename_dotfiles()
 
-    @staticmethod
-    def init_data():
+    def init_data(self):
+        self.timestamp = self.time_sec()
         pijuice_data = {"battery_charge": [],
                         "battery_voltage": [],
                         "battery_current": [],
@@ -140,6 +139,7 @@ class Power:
         while True:
             try:
                 data = self.get_data(pj, data)
+                self.write_data(data)
                 if write_cycles == 15:  # write out every 15 minutes
                     self.write_data(data)
                     data = self.init_data()
