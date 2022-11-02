@@ -35,10 +35,10 @@ class Power:
             for key in data.keys():
                 record = {"target":key, "datapoints": data[key]}
                 f.write(f'{json.dumps(record)}\n')
-        self.rename_dotfiles()
 
     def init_data(self):
         self.timestamp = self.time_sec()
+        self.rename_dotfiles()
         pijuice_data = {"battery_charge": [],
                         "battery_voltage": [],
                         "battery_current": [],
@@ -142,7 +142,7 @@ class Power:
                 data = self.get_data(pj, data)
                 self.write_data(data)
                 if write_cycles == 15:  # write out every 15 minutes
-                    self.write_data(data)
+                    #self.write_data(data)
                     data = self.init_data()
                     write_cycles = 1
                 write_cycles += 1
