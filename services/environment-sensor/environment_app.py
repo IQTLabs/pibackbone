@@ -65,12 +65,12 @@ def rename_dotfiles():
         os.rename(dotfile, non_dotfile)
 
 def write_sensor_data(sensor_data, timestamp):
-    tmp_filename = f'{sensor_dir}/.{hostname}-{timestamp}-environment_sensor_hat.json'
+    tmp_filename = f'{sensor_dir}/.{hostname}-{timestamp}-environment_sensor_hat.json'  # pytype: disable=name-error
     with open(tmp_filename, 'a') as f:
         for key in sensor_data.keys():
             record = {"target":key, "datapoints": sensor_data[key]}
-            f.write(f'{json.dumps(record)}\n')
-    rename_dotfiles()
+            f.write(f'{json.dumps(record)}\n')  # pytype: disable=name-error
+    rename_dotfiles()  # pytype: disable=name-error
 
 sensor_data = init_sensor_data()
 
