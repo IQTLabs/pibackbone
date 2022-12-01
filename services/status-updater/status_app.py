@@ -1,9 +1,11 @@
+import copy
 import glob
 import json
 import os
 import socket
 import subprocess
 import time
+from collections import defaultdict
 
 import docker
 
@@ -41,9 +43,9 @@ class Telemetry:
         self.hydrophone_size = 0
         self.power_file = os.path.join(self.power_dir, 'false')
         self.sensor_file = os.path.join(self.sensor_dir, 'false')
-        self.sensor_data = {}
         self.alerts = {}
         self.docker = docker.from_env()
+        self.init_sensor_data()
 
     def check_version(self, timestamp):
         healthy = True
@@ -250,13 +252,14 @@ class Telemetry:
             return True, len(files)
 
     def init_sensor_data(self):
-        self.sensor_data = {"location": [self.location],
-                            "system_load": [],
-                            "memory_used_mb": [],
-                            "internet": [],
-                            "disk_free_gb": [],
-                            "uptime_seconds": [],
-                           }
+        self.sensor_data = defaultdict(list)
+        self.sensor_data.update({
+            "location": [self.location],
+            "system_load": [],
+            "memory_used_mb": [],
+            "internet": [],
+            "disk_free_gb": [],
+            "uptime_seconds": []})
 
     def rename_dotfiles(self):
         for dotfile in glob.glob(os.path.join(self.status_dir, '.*')):
@@ -267,7 +270,7 @@ class Telemetry:
     def write_sensor_data(self, timestamp):
         status = self.status_hook()
         tmp_filename = f'{self.status_dir}/.status-{self.hostname}-{timestamp}.json'
-        payload = self.sensor_data
+        payload = copy.deepcopy(self.sensor_data)
         for key in payload.keys():
             payload[key] = payload[key][-1]
         payload['alerts'] = self.alerts
