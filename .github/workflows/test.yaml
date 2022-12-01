@@ -39,7 +39,7 @@ jobs:
         pip3 install -r services/s3-upload/requirements.txt && \
         pip3 install -r services/compass/requirements.txt && \
         export PYTHONPATH=$PWD/pibackbone:$PYTHONPATH && \
-        pytype . && \
+        timeout 900 pytype . && \
         pylint --fail-under=6.0 pibackbone && \
         PATH=/home/runner/.local/bin:$PATH py.test -v -vv --capture=tee-sys --cov-report term-missing --cov=services --cov=pibackbone -c .coveragerc && \
         PATH=/home/runner/.local/bin:$PATH coverage report && \

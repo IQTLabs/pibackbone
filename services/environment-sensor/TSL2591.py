@@ -164,11 +164,11 @@ class TSL2591:
         set0dataL = int(SET_LOW * self.Cpl + ir)
         set0dataH = int(SET_HIGH * self.Cpl + ir)
 
-        self.Write_Byte(AILTL_REGISTER, set0dataL & 0xFF)
-        self.Write_Byte(AILTH_REGISTER, set0dataL >> 8)
+        self.Write_Byte(AILTL_REGISTER, set0dataL & 0xFF)  # pytype: disable=name-error
+        self.Write_Byte(AILTH_REGISTER, set0dataL >> 8)  # pytype: disable=name-error
 
-        self.Write_Byte(AIHTL_REGISTER, set0dataH & 0xFF)
-        self.Write_Byte(AIHTH_REGISTER, set0dataH >> 8)
+        self.Write_Byte(AIHTL_REGISTER, set0dataH & 0xFF)  # pytype: disable=name-error
+        self.Write_Byte(AIHTH_REGISTER, set0dataH >> 8)  # pytype: disable=name-error
 
 
 if __name__ == '__main__':
