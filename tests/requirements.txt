@@ -2,4 +2,4 @@ codecov==2.1.12
 pylint==2.16.0
 pytest-cov==4.0.0
 pytest==7.2.1
-pytype==2023.1.17
+pytype==2023.1.31
