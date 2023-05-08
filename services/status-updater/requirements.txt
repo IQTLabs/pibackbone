@@ -1,2 +1,2 @@
-docker==6.0.1
+docker==6.1.1
 httpx==0.24.0
