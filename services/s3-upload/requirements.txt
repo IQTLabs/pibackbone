@@ -1,2 +1,2 @@
-awscli==1.27.142
+awscli==1.27.147
 schedule==1.2.0
