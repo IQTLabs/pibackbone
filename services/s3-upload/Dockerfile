@@ -1,5 +1,5 @@
 # nosemgrep:github.workflows.config.dockerfile-source-not-pinned
-FROM python:3.11-alpine
+FROM python:3.12-alpine
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 ENV PYTHONUNBUFFERED 1
 RUN apk update && apk add bash tar xz
