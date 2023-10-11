@@ -1,1 +1,1 @@
-sense-hat==2.4.0
+sense-hat==2.6.0
